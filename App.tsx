@@ -72,8 +72,13 @@ const App: React.FC = () => {
       });
     }
 
-    // 2. Recalculate Timeframes based on User Start Date (Dynamic Engine)
-    const startDate = new Date(userProfile.startDate);
+    // 2. Effective start: use today when no progress, else stored startDate
+    const totalCompleted = basePhases.reduce((sum, p) =>
+      sum + p.courses.reduce((s, c) =>
+        s + c.modules.reduce((mSum, m) =>
+          mSum + m.lessons.filter((l) => l.isCompleted).length, 0), 0), 0);
+    const effectiveStartMs = totalCompleted === 0 ? Date.now() : userProfile.startDate;
+    const startDate = new Date(effectiveStartMs);
     const durations = [5, 7, 4, 13]; // Duration in months for Phase 1, 2, 3, 4
     let current = new Date(startDate);
     
@@ -127,6 +132,17 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('cloudflow_resources', JSON.stringify(resources)); }, [resources]);
   useEffect(() => { localStorage.setItem('cloudflow_profile', JSON.stringify(userProfile)); }, [userProfile]);
   useEffect(() => { localStorage.setItem('cloudflow_settings', JSON.stringify(settings)); }, [settings]);
+
+  // When user has no progress, persist "today" as start date so phases and "days behind" stay correct
+  useEffect(() => {
+    const totalCompleted = phases.reduce((sum, p) =>
+      sum + p.courses.reduce((s, c) =>
+        s + c.modules.reduce((mSum, m) =>
+          mSum + m.lessons.filter((l) => l.isCompleted).length, 0), 0), 0);
+    if (totalCompleted === 0) {
+      setUserProfile((prev) => ({ ...prev, startDate: Date.now() }));
+    }
+  }, []);
 
   // Notification Logic
   useEffect(() => {
