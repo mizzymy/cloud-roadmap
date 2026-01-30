@@ -108,7 +108,7 @@ const ResourceList: React.FC<Omit<Props, 'phases'>> = ({ resources, onAddResourc
   };
 
   return (
-    <div className="bg-slate-850 p-4 md:p-6 rounded-xl border border-slate-700 h-[360px] md:h-full flex flex-col">
+    <div className="bg-slate-850 p-4 md:p-6 rounded-xl border border-slate-700 h-[396px] md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-white text-lg">Resource Hub</h3>
         <div className="flex bg-slate-900 rounded-lg p-1">
@@ -236,7 +236,7 @@ export const ToolsView: React.FC<Props> = ({ resources, onAddResource, onDeleteR
                <textarea className="w-full h-32 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300 focus:outline-none focus:border-aws-orange" placeholder="Jot down a quick thought..."></textarea>
              </div>
            </div>
-           <div className="min-h-[360px] lg:h-[calc(100vh-280px)]">
+           <div className="min-h-[396px] lg:h-[calc(100vh-280px)]">
              <ResourceList resources={resources} onAddResource={onAddResource} onDeleteResource={onDeleteResource} />
            </div>
          </div>
