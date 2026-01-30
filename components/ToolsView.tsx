@@ -78,6 +78,7 @@ const ResourceList: React.FC<Omit<Props, 'phases'>> = ({ resources, onAddResourc
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [activeTab, setActiveTab] = useState<'LINKS' | 'FILES'>('LINKS');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleAdd = () => {
     if (!newTitle) return;
@@ -92,8 +93,22 @@ const ResourceList: React.FC<Omit<Props, 'phases'>> = ({ resources, onAddResourc
     setNewUrl('');
   };
 
+  const handleFilePick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    onAddResource({
+      id: Date.now().toString(),
+      title: file.name,
+      url,
+      type: 'FILE',
+      tags: []
+    });
+    e.target.value = '';
+  };
+
   return (
-    <div className="bg-slate-850 p-4 md:p-6 rounded-xl border border-slate-700 h-[500px] md:h-full flex flex-col">
+    <div className="bg-slate-850 p-4 md:p-6 rounded-xl border border-slate-700 h-[360px] md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-white text-lg">Resource Hub</h3>
         <div className="flex bg-slate-900 rounded-lg p-1">
@@ -146,10 +161,29 @@ const ResourceList: React.FC<Omit<Props, 'phases'>> = ({ resources, onAddResourc
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
         />
+        {activeTab === 'FILES' && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFilePick}
+            />
+            <div className="flex gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm py-2 px-3 rounded border border-slate-600 focus:outline-none focus:border-aws-orange"
+              >
+                Choose file (Android / Windows)
+              </button>
+            </div>
+          </>
+        )}
         <div className="flex gap-2">
           <input 
             type="text" 
-            placeholder={activeTab === 'LINKS' ? "https://..." : "file:///C:/Users/..."} 
+            placeholder={activeTab === 'LINKS' ? "https://..." : "Or paste file:/// path (e.g. C:\\Users\\...)"} 
             className="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-aws-orange"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
@@ -161,7 +195,9 @@ const ResourceList: React.FC<Omit<Props, 'phases'>> = ({ resources, onAddResourc
             <PlusIcon className="w-5 h-5" />
           </button>
         </div>
-        {activeTab === 'FILES' && <p className="text-[10px] text-slate-500 mt-2">* Use file:/// path for local files (Browser security may vary)</p>}
+        {activeTab === 'FILES' && (
+          <p className="text-[10px] text-slate-500 mt-2">* Pick a file with the button above, or paste a file:/// path and add with +</p>
+        )}
       </div>
     </div>
   );
@@ -172,7 +208,7 @@ export const ToolsView: React.FC<Props> = ({ resources, onAddResource, onDeleteR
 
   return (
     <>
-      <div className="p-4 md:p-8 pb-32 md:pb-8 h-full max-w-7xl mx-auto space-y-6">
+      <div className="p-4 md:p-8 pb-32 md:pb-8 min-h-0 max-w-7xl mx-auto space-y-6 md:h-full">
          
          {/* Study Planner Hero Card */}
          <div className="w-full bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl border border-slate-700 p-6 flex items-center justify-between group cursor-pointer hover:border-aws-orange/50 transition-all shadow-xl"
@@ -192,7 +228,7 @@ export const ToolsView: React.FC<Props> = ({ resources, onAddResource, onDeleteR
              </div>
          </div>
 
-         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-auto lg:h-full">
            <div className="h-fit space-y-6">
              <FocusTimer />
              <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
@@ -200,7 +236,7 @@ export const ToolsView: React.FC<Props> = ({ resources, onAddResource, onDeleteR
                <textarea className="w-full h-32 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300 focus:outline-none focus:border-aws-orange" placeholder="Jot down a quick thought..."></textarea>
              </div>
            </div>
-           <div className="h-full lg:h-[calc(100vh-280px)]">
+           <div className="min-h-[360px] lg:h-[calc(100vh-280px)]">
              <ResourceList resources={resources} onAddResource={onAddResource} onDeleteResource={onDeleteResource} />
            </div>
          </div>
