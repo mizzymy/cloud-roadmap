@@ -2,17 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import RoadmapView from './components/RoadmapView';
 import ScheduleView from './components/ScheduleView';
-import { ToolsView } from './components/ToolsView';
+import { ToolsView, FocusTimer } from './components/ToolsView';
 import CourseDetail from './components/CourseDetail';
-import AICoach from './components/AICoach';
 import SettingsView from './components/SettingsView';
 import { UserStats } from './components/Gamification';
 import { AccountabilityTracker } from './components/AccountabilityTracker';
 import { INITIAL_PHASES, PRESET_LINKS_DEFAULT } from './constants';
 import { Phase, Resource, Course, UserProfile, AppSettings, PresetLink } from './types';
-import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, BrainIcon, SettingsIcon } from './components/Icons';
+import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, ClockIcon, SettingsIcon } from './components/Icons';
 
-type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'COACH' | 'COURSE_DETAIL' | 'SETTINGS';
+type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'FOCUS' | 'COURSE_DETAIL' | 'SETTINGS';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('DASHBOARD');
@@ -284,9 +283,9 @@ const App: React.FC = () => {
           <MapIcon className="w-5 h-5" />
           <span className="text-[10px] mt-1 font-medium">Roadmap</span>
       </button>
-       <button onClick={() => onChange('COACH')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'COACH' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
-          <BrainIcon className="w-5 h-5" />
-          <span className="text-[10px] mt-1 font-medium">Coach</span>
+       <button onClick={() => onChange('FOCUS')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'FOCUS' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
+          <ClockIcon className="w-5 h-5" />
+          <span className="text-[10px] mt-1 font-medium">Focus</span>
       </button>
       <button onClick={() => onChange('TOOLS')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'TOOLS' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
           <ToolIcon className="w-5 h-5" />
@@ -315,7 +314,7 @@ const App: React.FC = () => {
           <NavItem view="ROADMAP" icon={MapIcon} label="Roadmap" />
           <NavItem view="SCHEDULE" icon={CalendarIcon} label="Schedule" />
           <NavItem view="TOOLS" icon={ToolIcon} label="Tools & Files" />
-          <NavItem view="COACH" icon={BrainIcon} label="AI Mentor" />
+          <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />
         </nav>
 
         <div className="mt-auto">
@@ -463,9 +462,9 @@ const App: React.FC = () => {
              />
           )}
 
-          {currentView === 'COACH' && (
-            <div className="p-4 h-full max-w-4xl mx-auto flex flex-col pb-4">
-              <AICoach />
+          {currentView === 'FOCUS' && (
+            <div className="p-4 md:p-8 pb-32 md:pb-8 max-w-2xl mx-auto">
+              <FocusTimer />
             </div>
           )}
 
