@@ -313,7 +313,7 @@ const App: React.FC = () => {
           <NavItem view="DASHBOARD" icon={HomeIcon} label="Dashboard" />
           <NavItem view="ROADMAP" icon={MapIcon} label="Roadmap" />
           <NavItem view="SCHEDULE" icon={CalendarIcon} label="Schedule" />
-          <NavItem view="TOOLS" icon={ToolIcon} label="Tools & Files" />
+          <NavItem view="TOOLS" icon={ToolIcon} label="Tools" />
           <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />
         </nav>
 

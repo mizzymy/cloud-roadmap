@@ -409,7 +409,6 @@ export const ToolsView: React.FC<Props> = ({
 
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-auto lg:h-full">
            <div className="h-fit space-y-6">
-             <FocusTimer />
              <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
                <h3 className="font-bold text-white mb-2">Quick Scratchpad</h3>
                <textarea className="w-full h-32 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300 focus:outline-none focus:border-aws-orange" placeholder="Jot down a quick thought..."></textarea>
