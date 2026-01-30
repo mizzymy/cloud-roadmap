@@ -76,7 +76,7 @@ const RoadmapView: React.FC<Props> = ({ phases, onPhaseUpdate, onSelectCourse })
                           <div className={`w-2 h-10 rounded-l-lg mr-3
                             ${course.provider === 'Coursera' ? 'bg-blue-500' : course.provider === 'Cantrill' ? 'bg-purple-500' : 'bg-green-500'}
                           `}></div>
-                          <div className="flex-1 overflow-hidden">
+                          <div className="flex-1 overflow-hidden min-w-0">
                             <div className="text-xs text-slate-400">{course.provider}</div>
                             <div className="text-sm font-medium text-white group-hover:text-aws-light truncate">{course.title}</div>
                           </div>

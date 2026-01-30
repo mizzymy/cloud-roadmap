@@ -89,12 +89,12 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
   return (
     <div className="h-full flex flex-col bg-slate-950 relative">
       {/* Header */}
-      <div className="bg-slate-900 border-b border-slate-800 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sticky top-0 z-30 shadow-lg md:shadow-none">
-        <div className="flex items-center gap-4 w-full md:w-auto">
+      <div className="bg-slate-900 border-b border-slate-800 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sticky top-0 z-30 shadow-lg md:shadow-none overflow-hidden">
+        <div className="flex items-center gap-4 w-full md:w-auto min-w-0">
           <button onClick={onBack} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition shrink-0">
             ← <span className="hidden md:inline">Back</span>
           </button>
-          <div className="flex-1 md:flex-none">
+          <div className="flex-1 md:flex-none min-w-0">
             <div className="text-[10px] md:text-xs text-aws-orange font-bold uppercase tracking-wider mb-0.5">{course.provider}</div>
             <h1 className="text-lg md:text-2xl font-bold text-white truncate">{course.title}</h1>
           </div>
@@ -177,14 +177,14 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
         </div>
 
         {/* Main Content: Study Area */}
-        <div className="flex-1 overflow-y-auto bg-slate-950 p-4 md:p-8 w-full">
+        <div className="flex-1 min-w-0 overflow-y-auto bg-slate-950 p-4 md:p-8 w-full">
            {activeLesson ? (
-             <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+             <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 min-w-0">
                 {/* Lesson Header */}
-                <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-6">
-                   <div className="w-full">
-                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                       <span className="bg-slate-800 text-slate-300 text-[10px] md:text-xs px-2 py-1 rounded border border-slate-700 font-mono">
+                <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-6 min-w-0">
+                   <div className="w-full min-w-0">
+                     <div className="flex flex-wrap items-center gap-2 mb-3 min-w-0">
+                       <span className="bg-slate-800 text-slate-300 text-[10px] md:text-xs px-2 py-1 rounded border border-slate-700 font-mono truncate max-w-full">
                          Module: {currentModule?.title}
                        </span>
                        <span className={`flex items-center gap-1 text-slate-900 text-[10px] md:text-xs px-2 py-1 rounded font-bold font-mono
@@ -209,7 +209,7 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
                        {activeLesson.type === 'LAB' ? 'Start Lab Session' : 'Watch Lesson'}
                      </a>
                    </div>
-                   <div className="w-full md:w-80 shrink-0">
+                   <div className="w-full md:w-80 shrink-0 min-w-0">
                      <FocusTimer />
                    </div>
                 </div>

@@ -332,7 +332,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto pb-24 md:pb-0 scroll-smooth">
+        <div className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto pb-24 md:pb-0 scroll-smooth">
           {currentView === 'DASHBOARD' && (
             <div className="p-4 md:p-8 max-w-7xl mx-auto">
               <header className="mb-6 md:mb-8">

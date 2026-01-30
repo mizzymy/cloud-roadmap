@@ -49,16 +49,16 @@ export const FocusTimer: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-850 p-6 rounded-xl border border-slate-700 shadow-lg">
+    <div className="bg-slate-850 p-6 rounded-xl border border-slate-700 shadow-lg min-w-0 max-w-full">
       <div className="flex items-center gap-2 mb-4 text-aws-light">
         <ClockIcon className="w-5 h-5" />
         <h3 className="font-semibold">Focus Timer</h3>
       </div>
       <div className="text-center mb-6">
-        <div className="text-5xl font-mono font-bold text-white tracking-wider mb-2">
+        <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-wider mb-2">
           {formatTime(timeLeft)}
         </div>
-        <div className="text-xs text-slate-400 uppercase tracking-widest">{mode} MODE</div>
+        <div className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-widest">{mode} MODE</div>
       </div>
       <div className="flex gap-2 justify-center">
         <button 
