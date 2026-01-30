@@ -91,6 +91,22 @@ export interface Resource {
   tags: string[];
 }
 
+export type PresetCategory =
+  | 'GOLD_STANDARD_AWS'
+  | 'NETWORKING'
+  | 'IAC'
+  | 'PYTHON'
+  | 'ARCHITECTURE'
+  | 'SECURITY';
+
+export interface PresetLink {
+  id: string;
+  title: string;
+  url: string;
+  description: string;
+  category: PresetCategory;
+}
+
 export interface AppSettings {
   username: string;
   notificationsEnabled: boolean;

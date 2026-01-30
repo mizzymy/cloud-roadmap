@@ -8,8 +8,8 @@ import AICoach from './components/AICoach';
 import SettingsView from './components/SettingsView';
 import { UserStats } from './components/Gamification';
 import { AccountabilityTracker } from './components/AccountabilityTracker';
-import { INITIAL_PHASES } from './constants';
-import { Phase, Resource, Course, UserProfile, AppSettings } from './types';
+import { INITIAL_PHASES, PRESET_LINKS_DEFAULT } from './constants';
+import { Phase, Resource, Course, UserProfile, AppSettings, PresetLink } from './types';
 import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, BrainIcon, SettingsIcon } from './components/Icons';
 
 type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'COACH' | 'COURSE_DETAIL' | 'SETTINGS';
@@ -21,6 +21,19 @@ const App: React.FC = () => {
   const [resources, setResources] = useState<Resource[]>(() => {
     const saved = localStorage.getItem('cloudflow_resources');
     return saved ? JSON.parse(saved) : [];
+  });
+
+  const [presetLinks, setPresetLinks] = useState<PresetLink[]>(() => {
+    const saved = localStorage.getItem('cloudflow_preset_links');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : PRESET_LINKS_DEFAULT;
+      } catch {
+        return PRESET_LINKS_DEFAULT;
+      }
+    }
+    return PRESET_LINKS_DEFAULT;
   });
 
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
@@ -129,6 +142,7 @@ const App: React.FC = () => {
   // Persistence
   useEffect(() => { localStorage.setItem('cloudflow_phases', JSON.stringify(phases)); }, [phases]);
   useEffect(() => { localStorage.setItem('cloudflow_resources', JSON.stringify(resources)); }, [resources]);
+  useEffect(() => { localStorage.setItem('cloudflow_preset_links', JSON.stringify(presetLinks)); }, [presetLinks]);
   useEffect(() => { localStorage.setItem('cloudflow_profile', JSON.stringify(userProfile)); }, [userProfile]);
   useEffect(() => { localStorage.setItem('cloudflow_settings', JSON.stringify(settings)); }, [settings]);
 
@@ -195,6 +209,14 @@ const App: React.FC = () => {
 
   const handleDeleteResource = (id: string) => {
     setResources(prev => prev.filter(r => r.id !== id));
+  };
+
+  const handleUpdatePreset = (id: string, partial: Partial<PresetLink>) => {
+    setPresetLinks(prev => prev.map(p => p.id === id ? { ...p, ...partial } : p));
+  };
+
+  const handleResetPresets = () => {
+    setPresetLinks(PRESET_LINKS_DEFAULT);
   };
 
   const handleResetProgress = () => {
@@ -434,6 +456,9 @@ const App: React.FC = () => {
                 resources={resources} 
                 onAddResource={handleAddResource} 
                 onDeleteResource={handleDeleteResource}
+                presetLinks={presetLinks}
+                onUpdatePreset={handleUpdatePreset}
+                onResetPresets={handleResetPresets}
                 phases={phases}
              />
           )}

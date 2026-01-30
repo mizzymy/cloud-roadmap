@@ -1,5 +1,5 @@
 
-import { Phase, PhaseStatus, Course } from './types';
+import { Phase, PhaseStatus, Course, PresetLink } from './types';
 
 // Helper to create lessons quickly. Defaults to VIDEO type.
 const l = (title: string, duration: string, type: 'VIDEO' | 'LAB' | 'QUIZ' = 'VIDEO') => ({ 
@@ -1608,6 +1608,21 @@ export const INITIAL_PHASES: Phase[] = [
       url: 'https://skillbuilder.aws/category/exam-prep/solutions-architect-professional-SAP-C02'
     }
   }
+];
+
+export const PRESET_LINKS_DEFAULT: PresetLink[] = [
+  { id: 'preset-1', title: 'Tutorials Dojo AWS Cheat Sheets', url: 'https://tutorialsdojo.com/aws-cheat-sheets/', description: 'The most detailed building codes for SAA and SAP exams.', category: 'GOLD_STANDARD_AWS' },
+  { id: 'preset-2', title: 'AWS Ramp-Up Guides', url: 'https://aws.amazon.com/training/ramp-up-guides/', description: 'Official learning paths from Amazon.', category: 'GOLD_STANDARD_AWS' },
+  { id: 'preset-3', title: 'Digital Cloud Training AWS Cheat Sheets', url: 'https://digitalcloud.training/aws-cheat-sheets/', description: 'Free AWS cheat sheets by certification and by service.', category: 'GOLD_STANDARD_AWS' },
+  { id: 'preset-4', title: 'PacketLife.net Cheat Sheets', url: 'https://packetlife.net/library/cheat-sheets/', description: 'IPv4 subnetting, common ports, networking legend.', category: 'NETWORKING' },
+  { id: 'preset-5', title: 'Cidr.xyz', url: 'https://cidr.xyz/', description: 'Interactive subnet calculator.', category: 'NETWORKING' },
+  { id: 'preset-6', title: 'Terraform Visualizer', url: 'https://terraform-visualizer.vercel.app/', description: 'Upload code and see a 3D blueprint of your stack.', category: 'IAC' },
+  { id: 'preset-7', title: 'HashiCorp Terraform Cheat Sheet', url: 'https://medium.com/weekly-we-tf/terraform-cheat-sheet-93510c41097e', description: 'Quick reference for Terraform commands.', category: 'IAC' },
+  { id: 'preset-8', title: 'Real Python Cheat Sheets', url: 'https://realpython.com/python-cheat-sheet/', description: 'Clean basics for automation scripts.', category: 'PYTHON' },
+  { id: 'preset-9', title: 'Python for Beginners (Mosh)', url: 'https://programmingwithmosh.com/python/python-3-cheat-sheet/', description: 'Single-page Python syntax reference.', category: 'PYTHON' },
+  { id: 'preset-10', title: 'Cloudcraft.co', url: 'https://www.cloudcraft.co/', description: '3D AWS diagrams for pros.', category: 'ARCHITECTURE' },
+  { id: 'preset-11', title: 'AWS Architecture Icons', url: 'https://aws.amazon.com/architecture/icons/', description: 'Official icons for blueprints.', category: 'ARCHITECTURE' },
+  { id: 'preset-12', title: 'AWS Well-Architected Framework', url: 'https://aws.amazon.com/architecture/well-architected/', description: 'Six pillars for secure, resilient cloud design.', category: 'SECURITY' }
 ];
 
 export const SYSTEM_INSTRUCTION = `
