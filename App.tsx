@@ -11,6 +11,7 @@ import { RewardsView } from './components/RewardsView';
 import { INITIAL_PHASES, PRESET_LINKS_DEFAULT } from './constants';
 import { Phase, Resource, Course, UserProfile, AppSettings, PresetLink } from './types';
 import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, ClockIcon, SettingsIcon } from './components/Icons';
+import { FocusDashboard } from './components/FocusDashboard';
 
 type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'FOCUS' | 'COURSE_DETAIL' | 'SETTINGS' | 'REWARDS';
 
@@ -484,8 +485,8 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'FOCUS' && (
-            <div className="p-4 md:p-8 pb-32 md:pb-8 max-w-2xl mx-auto">
-              <FocusTimer />
+            <div className="p-4 md:p-8 pb-32 md:pb-8 h-full flex flex-col">
+              <FocusDashboard />
             </div>
           )}
 
