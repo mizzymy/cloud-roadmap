@@ -62,7 +62,7 @@ export const FocusTimer: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-850 p-6 rounded-xl border border-slate-700 shadow-lg min-w-0 max-w-full">
+    <div className="bg-slate-900/40 backdrop-blur-md p-6 rounded-xl border border-white/5 shadow-2xl min-w-0 max-w-full">
       <div className="flex items-center gap-2 mb-4 text-aws-light">
         <ClockIcon className="w-5 h-5" />
         <h3 className="font-semibold">Focus Timer</h3>
@@ -74,7 +74,7 @@ export const FocusTimer: React.FC = () => {
         <div className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-widest">{mode} MODE</div>
       </div>
       <div className="flex gap-2 justify-center">
-        <button 
+        <button
           onClick={toggleTimer}
           className={`flex-1 py-2 rounded-lg font-medium transition ${isActive ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}
         >
@@ -169,7 +169,7 @@ const ResourceList: React.FC<Omit<Props, 'phases'>> = ({
   };
 
   return (
-    <div className="bg-slate-850 p-4 md:p-6 rounded-xl border border-slate-700 h-[396px] md:h-full flex flex-col min-w-0">
+    <div className="bg-slate-900/40 backdrop-blur-md p-4 md:p-6 rounded-xl border border-white/5 h-[396px] md:h-full flex flex-col min-w-0 shadow-xl">
       <div className="flex justify-between items-center mb-3 flex-shrink-0">
         <h3 className="font-bold text-white text-lg">Resource Hub</h3>
         <div className="flex bg-slate-900 rounded-lg p-1 flex-shrink-0">
@@ -388,34 +388,35 @@ export const ToolsView: React.FC<Props> = ({
   return (
     <>
       <div className="p-4 md:p-8 pb-32 md:pb-8 min-h-0 max-w-7xl mx-auto space-y-6 md:h-full">
-         
-         {/* Study Planner Hero Card */}
-         <div className="w-full bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl border border-slate-700 p-6 flex items-center justify-between group cursor-pointer hover:border-aws-orange/50 transition-all shadow-xl"
-              onClick={() => setShowPlanner(true)}
-         >
-             <div className="flex items-center gap-6">
-                <div className="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center border border-slate-800 group-hover:border-aws-orange transition-colors">
-                    <LayoutIcon className="w-8 h-8 text-aws-orange" />
-                </div>
-                <div>
-                   <h2 className="text-xl md:text-2xl font-bold text-white mb-1">CloudFlow Workbook</h2>
-                   <p className="text-slate-400 text-sm">Comprehensive study planner, to-dos, and notes for every exam.</p>
-                </div>
-             </div>
-             <div className="bg-aws-orange text-slate-900 px-4 py-2 rounded-lg font-bold flex items-center gap-2 group-hover:bg-white transition-colors">
-                Launch <ChevronRightIcon className="w-5 h-5" />
-             </div>
-         </div>
 
-         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-auto lg:h-full">
-           <div className="h-fit space-y-6">
-             <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-               <h3 className="font-bold text-white mb-2">Quick Scratchpad</h3>
-               <textarea className="w-full h-32 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300 focus:outline-none focus:border-aws-orange" placeholder="Jot down a quick thought..."></textarea>
-             </div>
-           </div>
-           <div className="min-h-[396px] lg:h-[calc(100vh-280px)]">
-             <ResourceList
+        {/* Study Planner Hero Card */}
+        <div className="w-full bg-gradient-to-r from-slate-900/60 to-slate-900/40 backdrop-blur-xl rounded-xl border border-white/5 p-6 flex items-center justify-between group cursor-pointer hover:border-aws-orange/50 transition-all shadow-2xl relative overflow-hidden"
+          onClick={() => setShowPlanner(true)}
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-aws-orange/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 group-hover:bg-aws-orange/10 transition-colors"></div>
+          <div className="flex items-center gap-6 relative z-10">
+            <div className="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center border border-slate-800 group-hover:border-aws-orange transition-colors">
+              <LayoutIcon className="w-8 h-8 text-aws-orange" />
+            </div>
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-1">CloudFlow Workbook</h2>
+              <p className="text-slate-400 text-sm">Comprehensive study planner, to-dos, and notes for every exam.</p>
+            </div>
+          </div>
+          <div className="bg-aws-orange text-slate-900 px-4 py-2 rounded-lg font-bold flex items-center gap-2 group-hover:bg-white transition-colors">
+            Launch <ChevronRightIcon className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-auto lg:h-full">
+          <div className="h-fit space-y-6">
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <h3 className="font-bold text-white mb-2">Quick Scratchpad</h3>
+              <textarea className="w-full h-32 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300 focus:outline-none focus:border-aws-orange" placeholder="Jot down a quick thought..."></textarea>
+            </div>
+          </div>
+          <div className="min-h-[396px] lg:h-[calc(100vh-280px)]">
+            <ResourceList
               resources={resources}
               onAddResource={onAddResource}
               onDeleteResource={onDeleteResource}
@@ -423,8 +424,8 @@ export const ToolsView: React.FC<Props> = ({
               onUpdatePreset={onUpdatePreset}
               onResetPresets={onResetPresets}
             />
-           </div>
-         </div>
+          </div>
+        </div>
       </div>
 
       {/* Full Screen Overlay for Study Planner */}

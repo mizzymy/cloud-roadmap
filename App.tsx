@@ -264,53 +264,59 @@ const App: React.FC = () => {
   const NavItem = ({ view, icon: Icon, label }: { view: View, icon: any, label: string }) => (
     <button
       onClick={() => setCurrentView(view)}
-      className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 mb-1 group
+      className={`relative flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-300 mb-1 group overflow-hidden
         ${currentView === view
-          ? 'bg-aws-orange text-slate-900 font-bold shadow-lg shadow-orange-500/20'
-          : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+          ? 'bg-gradient-to-r from-aws-orange/20 to-transparent text-white font-medium shadow-[inset_3px_0_0_0_#FF9900]'
+          : 'text-slate-400 hover:bg-white/5 hover:text-white hover:shadow-[inset_3px_0_0_0_rgba(255,255,255,0.2)]'}`}
     >
-      <Icon className={`w-5 h-5 ${currentView === view ? 'text-slate-900' : 'text-slate-500 group-hover:text-white'}`} />
-      <span>{label}</span>
+      <Icon className={`w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 ${currentView === view ? 'text-aws-orange drop-shadow-sm' : 'text-slate-500 group-hover:text-white'}`} />
+      <span className="relative z-10">{label}</span>
+      {currentView === view && <div className="absolute inset-0 bg-aws-orange/5 animate-pulse"></div>}
     </button>
   );
 
   const MobileNav = ({ currentView, onChange }: { currentView: View, onChange: (v: View) => void }) => (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 flex justify-around p-2 pb-safe z-50 shadow-2xl">
-      <button onClick={() => onChange('DASHBOARD')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'DASHBOARD' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
+    <div className="md:hidden fixed bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl flex justify-around p-2 z-50 shadow-2xl safe-pb">
+      <button onClick={() => onChange('DASHBOARD')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'DASHBOARD' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
         <HomeIcon className="w-5 h-5" />
-        <span className="text-[10px] mt-1 font-medium">Home</span>
       </button>
-      <button onClick={() => onChange('ROADMAP')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'ROADMAP' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
+      <button onClick={() => onChange('ROADMAP')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'ROADMAP' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
         <MapIcon className="w-5 h-5" />
-        <span className="text-[10px] mt-1 font-medium">Roadmap</span>
       </button>
-      <button onClick={() => onChange('FOCUS')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'FOCUS' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
+      <button onClick={() => onChange('FOCUS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'FOCUS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
         <ClockIcon className="w-5 h-5" />
-        <span className="text-[10px] mt-1 font-medium">Focus</span>
       </button>
-      <button onClick={() => onChange('TOOLS')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'TOOLS' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
+      <button onClick={() => onChange('TOOLS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'TOOLS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
         <ToolIcon className="w-5 h-5" />
-        <span className="text-[10px] mt-1 font-medium">Tools</span>
       </button>
-      <button onClick={() => onChange('SETTINGS')} className={`flex flex-col items-center p-2 rounded-lg transition-colors ${currentView === 'SETTINGS' ? 'text-aws-orange bg-slate-800/50' : 'text-slate-400'}`}>
+      <button onClick={() => onChange('SETTINGS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'SETTINGS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
         <SettingsIcon className="w-5 h-5" />
-        <span className="text-[10px] mt-1 font-medium">Settings</span>
       </button>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-200 flex overflow-hidden selection:bg-aws-orange/30">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-900/10 to-transparent opacity-50"></div>
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-aws-orange/5 rounded-full blur-[100px]"></div>
+      </div>
+
       {/* Sidebar (Desktop) */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col hidden md:flex z-20 shadow-xl">
-        <div className="mb-8 px-2 flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-aws-orange to-red-500 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      <aside className="w-72 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col hidden md:flex z-20 shadow-2xl relative">
+        <div className="mb-10 px-2 flex items-center gap-3 group cursor-default">
+          <div className="w-10 h-10 bg-gradient-to-br from-aws-orange to-red-600 rounded-xl shadow-lg shadow-orange-500/20 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
           </div>
-          <h1 className="text-xl font-bold text-white tracking-tight">CloudFlow</h1>
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight leading-none">CloudFlow</h1>
+            <div className="text-[10px] text-slate-500 font-mono tracking-widest uppercase mt-1">Roadmap OS</div>
+          </div>
         </div>
 
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-2">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 mb-2">Menu</div>
           <NavItem view="DASHBOARD" icon={HomeIcon} label="Dashboard" />
           <NavItem view="ROADMAP" icon={MapIcon} label="Roadmap" />
           <NavItem view="SCHEDULE" icon={CalendarIcon} label="Schedule" />
@@ -318,36 +324,49 @@ const App: React.FC = () => {
           <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />
         </nav>
 
-        <div className="mt-auto">
+        <div className="mt-auto space-y-4">
           <NavItem view="SETTINGS" icon={SettingsIcon} label="Settings" />
-          <div className="mt-4 p-4 bg-slate-800 rounded-xl border border-slate-700">
-            <div className="text-xs text-slate-400 uppercase font-semibold mb-2">Next Exam</div>
-            <div className="font-bold text-white mb-1">AWS Cloud Prac.</div>
-            <div className="text-sm text-aws-orange">Target: {phases[0].milestone.date}</div>
+
+          {/* Target Card */}
+          <div className="p-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-white/5 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-aws-orange/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Current Target</div>
+              <div className="font-bold text-white mb-1 group-hover:text-aws-orange transition-colors">AWS Cloud Prac.</div>
+              <div className="text-xs text-slate-500">Deadline: <span className="text-slate-300">{phases[0].milestone.date}</span></div>
+            </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content - min-w-0 so it can shrink to viewport on mobile (fixes overflow for long course titles) */}
-      <main className="flex-1 flex flex-col h-screen relative min-w-0">
+      <main className="flex-1 flex flex-col h-screen relative min-w-0 z-10">
         {/* Top Bar with User Stats */}
-        <div className="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center z-10 sticky top-0 md:relative">
+        <div className="bg-slate-950/80 backdrop-blur-lg border-b border-white/5 p-4 md:px-8 flex justify-between items-center z-30 sticky top-0 transition-all">
           <div className="md:hidden flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-aws-orange to-red-500 rounded-lg flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             </div>
             <span className="font-bold text-lg text-white">CloudFlow</span>
           </div>
-          <div className="hidden md:block text-slate-500 text-sm">
-            {currentView === 'DASHBOARD' ? "Overview" :
-              currentView === 'COURSE_DETAIL' ? "Study Mode" :
-                currentView.charAt(0) + currentView.slice(1).toLowerCase()}
+
+          <div className="hidden md:flex items-center gap-4 text-sm font-medium">
+            <span className="text-slate-500">View:</span>
+            <span className="text-white bg-white/5 px-3 py-1 rounded-full border border-white/5">
+              {currentView === 'DASHBOARD' ? "Overview" :
+                currentView === 'COURSE_DETAIL' ? "Study Mode" :
+                  currentView.charAt(0) + currentView.slice(1).toLowerCase()}
+            </span>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-6">
             {settings.notificationsEnabled && (
-              <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Reminders On ({settings.reminderTime})
+              <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 bg-slate-900/50 px-3 py-1.5 rounded-full border border-white/5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                {settings.reminderTime}
               </div>
             )}
             <UserStats profile={userProfile} onClick={() => setCurrentView('REWARDS')} />
