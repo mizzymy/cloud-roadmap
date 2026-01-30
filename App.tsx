@@ -306,8 +306,8 @@ const App: React.FC = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen relative">
+      {/* Main Content - min-w-0 so it can shrink to viewport on mobile (fixes overflow for long course titles) */}
+      <main className="flex-1 flex flex-col h-screen relative min-w-0">
         {/* Top Bar with User Stats */}
         <div className="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center z-10 sticky top-0 md:relative">
           <div className="md:hidden flex items-center gap-2">

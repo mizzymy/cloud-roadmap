@@ -87,7 +87,7 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
   const currentModule = course.modules.find(m => m.id === activeModuleId);
 
   return (
-    <div className="h-full flex flex-col bg-slate-950 relative">
+    <div className="h-full w-full min-w-0 max-w-full flex flex-col bg-slate-950 relative overflow-x-hidden">
       {/* Header */}
       <div className="bg-slate-900 border-b border-slate-800 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sticky top-0 z-30 shadow-lg md:shadow-none overflow-hidden">
         <div className="flex items-center gap-4 w-full md:w-auto min-w-0">
@@ -96,7 +96,7 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
           </button>
           <div className="flex-1 md:flex-none min-w-0">
             <div className="text-[10px] md:text-xs text-aws-orange font-bold uppercase tracking-wider mb-0.5">{course.provider}</div>
-            <h1 className="text-lg md:text-2xl font-bold text-white truncate">{course.title}</h1>
+            <h1 className="text-lg md:text-2xl font-bold text-white break-words line-clamp-3">{course.title}</h1>
           </div>
           {/* Mobile Syllabus Toggle */}
           <button 
