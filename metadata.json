@@ -1,5 +1,5 @@
 {
-  "name": "CloudFlow: Plumber to Architect",
-  "description": "A dedicated career tracker and study dashboard optimized for the transition from trade skills to AWS Cloud Architecture.",
+  "name": "CloudFlow: Cloud Roadmap",
+  "description": "A career tracker and study dashboard for learning AWS Cloud Architecture.",
   "requestFramePermissions": []
 }

@@ -1471,7 +1471,7 @@ export const INITIAL_PHASES: Phase[] = [
         completedModules: 0,
         modules: CANTRILL_FUNDAMENTALS_MODULES,
         achievements: [
-          { id: 'a-cf-1', title: 'Bit Plumber', description: 'Understand OSI Model', xpReward: 600, icon: '🔧' },
+          { id: 'a-cf-1', title: 'Bit Builder', description: 'Understand OSI Model', xpReward: 600, icon: '🔧' },
           { id: 'a-cf-2', title: 'DNS Detective', description: 'Understand how DNS really works', xpReward: 600, icon: '🔍' }
         ]
       }
@@ -1502,7 +1502,7 @@ export const INITIAL_PHASES: Phase[] = [
         modules: SAA_MODULES,
         achievements: [
             { id: 'a-saa-1', title: 'Security Marshall', description: 'Lockdown Root Account', xpReward: 1000, icon: '🛡️' },
-            { id: 'a-saa-2', title: 'Network Plumber', description: 'Build Custom VPC', xpReward: 2500, icon: '🏗️' },
+            { id: 'a-saa-2', title: 'Network Builder', description: 'Build Custom VPC', xpReward: 2500, icon: '🏗️' },
             { id: 'a-saa-3', title: 'Web Architect', description: 'Host WordPress on EC2', xpReward: 2000, icon: '🌐' },
             { id: 'a-saa-4', title: 'Serverless Hero', description: 'Build Pet-Cuddle-o-Tron', xpReward: 3000, icon: '🚀' },
             { id: 'a-saa-5', title: 'Storage Tycoon', description: 'Master S3 Classes & Lifecycle', xpReward: 1500, icon: '🗄️' },
@@ -1611,20 +1611,7 @@ export const INITIAL_PHASES: Phase[] = [
 ];
 
 export const SYSTEM_INSTRUCTION = `
-You are an expert Senior Cloud Architect and Career Mentor. 
-The user is a professional plumber transitioning into Tech (AWS Cloud).
-Your teaching style is unique: YOU MUST EXPLAIN ALL TECHNICAL CONCEPTS USING PLUMBING ANALOGIES.
-
-Examples:
-- Data flow = Water flow
-- Bandwidth = Pipe diameter
-- Security Groups = Valves/Taps
-- Load Balancer = Distribution manifold
-- CloudWatch = Pressure gauge/Leak detection sensor
-- Latency = Pipe length/friction
-- EC2 = A pump or boiler unit
-- S3 = Water tank/Cistern
-
-Be encouraging, respectful of their trade background, and extremely practical. 
-Focus on "The Working Man's" efficiency. Short, punchy, high-value answers.
+You are an expert Senior Cloud Architect and Career Mentor.
+Your teaching style: explain technical concepts using clear, practical analogies (e.g. data flow like water flow, bandwidth like pipe capacity, Security Groups like valves, Load Balancer like a distribution manifold, CloudWatch like gauges/sensors, EC2 like a pump/unit, S3 like a tank).
+Be encouraging, practical, and concise. Short, punchy, high-value answers.
 `;
