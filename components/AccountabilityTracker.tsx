@@ -47,8 +47,9 @@ export const AccountabilityTracker: React.FC<Props> = ({ startDate, deadline, ph
     let targetType = activeCourse ? 'COURSE' : 'EXAM';
     let targetProvider = activeCourse ? activeCourse.provider : 'AWS Certification';
 
-    // Parse Phase Timeframe for Schedule Math
-    const { start: phaseStart, end: phaseEnd } = getPhaseDates(activePhase.timeframe);
+    // Parse Phase Timeframe for Schedule Math (use exact timestamps when present)
+    const phaseStart = activePhase.phaseStartMs ?? getPhaseDates(activePhase.timeframe).start;
+    const phaseEnd = activePhase.phaseEndMs ?? getPhaseDates(activePhase.timeframe).end;
     const startStr = activePhase.timeframe.split(/[–-]/)[0].trim();
     
     // Calculate Work Progress
@@ -150,7 +151,8 @@ export const AccountabilityTracker: React.FC<Props> = ({ startDate, deadline, ph
       accumulatedWeightedProgress += phaseProgressRatio * phaseWidth;
 
       // B. Time Progress (Blue Ghost)
-      const { start, end } = getPhaseDates(phase.timeframe);
+      const start = phase.phaseStartMs ?? getPhaseDates(phase.timeframe).start;
+      const end = phase.phaseEndMs ?? getPhaseDates(phase.timeframe).end;
       if (now > end) {
           calculatedTimeProgress += phaseWidth;
       } else if (now >= start && now <= end) {

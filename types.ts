@@ -55,6 +55,8 @@ export interface Phase {
   goal: string;
   weeklyCommitment: string;
   courses: Course[];
+  phaseStartMs?: number;
+  phaseEndMs?: number;
   milestone: {
     name: string;
     date: string;

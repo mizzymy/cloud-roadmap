@@ -85,26 +85,25 @@ const App: React.FC = () => {
     return basePhases.map((p, i) => {
         const duration = durations[i];
         
-        // Start Date String
-        const startStr = current.toLocaleString('default', { month: 'short', year: 'numeric' });
+        const phaseStartMs = current.getTime();
+        const startStr = current.toLocaleString('default', { month: 'short', day: 'numeric', year: 'numeric' });
         
-        // Calculate End Date
         const end = new Date(current);
         end.setMonth(end.getMonth() + duration);
         
-        // Display End Date (Last day of the previous month relative to the *next* start)
         const displayEnd = new Date(end);
-        displayEnd.setDate(0); 
+        displayEnd.setDate(0);
+        const phaseEndMs = new Date(displayEnd.getFullYear(), displayEnd.getMonth() + 1, 0).getTime();
         const endStr = displayEnd.toLocaleString('default', { month: 'short', year: 'numeric' });
         
-        // Milestone Date String
         const milestoneDate = displayEnd.toLocaleString('default', { month: 'long', year: 'numeric' });
         
-        // Advance current pointer
         current = end;
         
         return {
             ...p,
+            phaseStartMs,
+            phaseEndMs,
             timeframe: `${startStr} – ${endStr}`,
             milestone: {
                 ...p.milestone,
