@@ -1,21 +1,14 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# CloudFlow
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1_LR8f-OIACZ7zETAGgEmxAsH8xv5QHwG
+A cloud certification roadmap and study app. Run it locally or deploy as a PWA.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Add your API key to [.env.local](.env.local) (see the app’s config for the variable name).
 3. Run the app:
    `npm run dev`
 
@@ -27,8 +20,8 @@ The app is set up as a Progressive Web App (PWA). Deploy it, then add it to your
 
 1. **Build:** Run `npm run build` (output is in `dist/`).
 2. **Deploy** the `dist/` folder to a host that serves over HTTPS:
-   - **Vercel:** Connect your repo; set build command `npm run build`, output directory `dist`. In Project Settings → Environment Variables, add `GEMINI_API_KEY`.
-   - **Netlify:** Build command `npm run build`, publish directory `dist`. In Site settings → Environment variables, add `GEMINI_API_KEY`.
+   - **Vercel:** Connect your repo; set build command `npm run build`, output directory `dist`. In Project Settings → Environment Variables, add your API key.
+   - **Netlify:** Build command `npm run build`, publish directory `dist`. In Site settings → Environment variables, add your API key.
 3. Use the URL you get (e.g. `https://your-app.vercel.app`).
 
 ### Add to your phone
