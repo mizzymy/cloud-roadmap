@@ -172,7 +172,7 @@ export const ToolsView: React.FC<Props> = ({ resources, onAddResource, onDeleteR
 
   return (
     <>
-      <div className="p-4 md:p-8 h-full max-w-7xl mx-auto space-y-6">
+      <div className="p-4 md:p-8 pb-32 md:pb-8 h-full max-w-7xl mx-auto space-y-6">
          
          {/* Study Planner Hero Card */}
          <div className="w-full bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl border border-slate-700 p-6 flex items-center justify-between group cursor-pointer hover:border-aws-orange/50 transition-all shadow-xl"
