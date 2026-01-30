@@ -18,7 +18,7 @@ export interface Lesson {
   duration: string; // e.g. "15m"
   type: 'VIDEO' | 'LAB' | 'QUIZ';
   isCompleted: boolean;
-  notes: Note[]; 
+  notes: Note[];
 }
 
 export interface Module {
@@ -35,6 +35,10 @@ export interface Achievement {
   xpReward: number;
   icon: string; // emoji or icon name
   unlockedAt?: number; // timestamp
+  isSecret?: boolean;
+  category?: 'LEARNING' | 'STREAK' | 'COMMUNITY' | 'MASTERY';
+  progress?: number; // 0-100
+  maxProgress?: number;
 }
 
 export interface Course {
@@ -86,7 +90,7 @@ export interface Resource {
   id: string;
   title: string;
   type: 'LINK' | 'FILE' | 'NOTE';
-  url?: string; 
+  url?: string;
   content?: string;
   tags: string[];
 }
