@@ -1,0 +1,23 @@
+{
+  "name": "CloudFlow Roadmap",
+  "short_name": "CloudFlow",
+  "description": "Career tracker and study dashboard for the transition from trade skills to AWS Cloud Architecture.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0B111A",
+  "background_color": "#0B111A",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
