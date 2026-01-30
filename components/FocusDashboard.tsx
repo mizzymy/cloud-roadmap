@@ -20,12 +20,39 @@ import { PHASE_4_EXAM_2 } from './data/exams/phase4-exam2';
 import { PHASE_4_EXAM_3 } from './data/exams/phase4-exam3';
 import { PHASE_4_EXAM_4 } from './data/exams/phase4-exam4';
 
-type FocusMode = 'DASHBOARD' | 'DECK' | 'EXAM_SELECT' | 'EXAM_RUNNER';
+import CloudDefender from './game/CloudDefender';
 
-export const FocusDashboard: React.FC = () => {
+type FocusMode = 'DASHBOARD' | 'DECK' | 'EXAM_SELECT' | 'EXAM_RUNNER' | 'CLOUD_DEFENDER';
+
+interface FocusDashboardProps {
+    onToggleImmersive?: (active: boolean) => void;
+}
+
+export const FocusDashboard: React.FC<FocusDashboardProps> = ({ onToggleImmersive }) => {
     const [mode, setMode] = useState<FocusMode>('DASHBOARD');
     const [selectedExam, setSelectedExam] = useState<any>(null);
     const [selectedPhase, setSelectedPhase] = useState<'PHASE_1' | 'PHASE_2' | 'PHASE_3' | 'PHASE_4'>('PHASE_1');
+
+    if (mode === 'CLOUD_DEFENDER') {
+        return (
+            <div className="flex flex-col h-full bg-slate-900 rounded-xl overflow-hidden shadow-2xl relative">
+                <div className="absolute top-4 left-4 z-[100]">
+                    <button
+                        onClick={() => {
+                            setMode('DASHBOARD');
+                            onToggleImmersive?.(false);
+                        }}
+                        className="text-slate-400 hover:text-white text-xs font-bold uppercase tracking-widest bg-slate-800/90 hover:bg-slate-700 px-4 py-2 rounded-full border border-slate-600 shadow-lg backdrop-blur-md transition-all flex items-center gap-2"
+                    >
+                        <span className="text-lg">←</span> EXIT MISSION
+                    </button>
+                </div>
+                <div className="flex-1 h-full">
+                    <CloudDefender />
+                </div>
+            </div>
+        );
+    }
 
     if (mode === 'EXAM_RUNNER' && selectedExam) {
         return <ExamApp exam={selectedExam} onExit={() => setMode('DASHBOARD')} />;
@@ -125,21 +152,20 @@ export const FocusDashboard: React.FC = () => {
                 <p className="text-slate-400">Choose your study mode. Build muscle memory or test your readiness.</p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Active Recall Card */}
                 <div
                     onClick={() => setMode('DECK')}
-                    className="group bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-aws-orange/50 p-8 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
+                    className="group bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-aws-orange/50 p-6 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-aws-orange/10 rounded-full blur-3xl group-hover:bg-aws-orange/20 transition-all"></div>
                     <div className="relative z-10">
                         <div className="w-12 h-12 bg-gradient-to-br from-aws-orange to-red-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform">
                             <BrainIcon className="w-6 h-6 text-white" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Active Recall Deck</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">Active Recall</h3>
                         <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                            Spaced repetition flashcards and quick quizzes to build your foundational knowledge.
-                            Perfect for daily practice.
+                            Spaced repetition flashcards and quizzes.
                         </p>
                         <div className="flex items-center gap-2 text-aws-orange text-xs font-bold uppercase tracking-wider">
                             Start Session →
@@ -150,7 +176,7 @@ export const FocusDashboard: React.FC = () => {
                 {/* Exam Sim Card */}
                 <div
                     onClick={() => setMode('EXAM_SELECT')}
-                    className="group bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-blue-500/50 p-8 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
+                    className="group bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-blue-500/50 p-6 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
                     <div className="relative z-10">
@@ -159,14 +185,37 @@ export const FocusDashboard: React.FC = () => {
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Exam Simulator</h3>
                         <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                            High-fidelity mock exams in a realistic testing environment.
-                            Timed, strictly scored, and scenario-based.
+                            Real-world mock scenarios and scoring.
                         </p>
                         <div className="flex items-center gap-2 text-blue-400 text-xs font-bold uppercase tracking-wider">
                             Select Exam →
                         </div>
                     </div>
                 </div>
+
+                {/* GAME MODE: CLOUD DEFENDER */}
+                <div
+                    onClick={() => {
+                        setMode('CLOUD_DEFENDER');
+                        onToggleImmersive?.(true);
+                    }}
+                    className="group bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-green-500/50 p-6 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-all"></div>
+                    <div className="relative z-10">
+                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Cloud Defender</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-6">
+                            Gamified Defense. Protect the architecture to learn.
+                        </p>
+                        <div className="flex items-center gap-2 text-green-400 text-xs font-bold uppercase tracking-wider">
+                            Deploy →
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );

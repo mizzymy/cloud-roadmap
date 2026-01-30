@@ -127,7 +127,7 @@ const App: React.FC = () => {
     });
   });
 
-  // Settings State
+  // ...
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('cloudflow_settings');
     return saved ? JSON.parse(saved) : {
@@ -139,6 +139,7 @@ const App: React.FC = () => {
   });
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [isImmersive, setIsImmersive] = useState(false);
 
   // Persistence
   useEffect(() => { localStorage.setItem('cloudflow_phases', JSON.stringify(phases)); }, [phases]);
@@ -146,6 +147,11 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('cloudflow_preset_links', JSON.stringify(presetLinks)); }, [presetLinks]);
   useEffect(() => { localStorage.setItem('cloudflow_profile', JSON.stringify(userProfile)); }, [userProfile]);
   useEffect(() => { localStorage.setItem('cloudflow_settings', JSON.stringify(settings)); }, [settings]);
+
+  // Reset immersive mode when view changes
+  useEffect(() => {
+    setIsImmersive(false);
+  }, [currentView]);
 
   // When user has no progress, persist "today" as start date so phases and "days behind" stay correct
   useEffect(() => {
@@ -305,76 +311,80 @@ const App: React.FC = () => {
       </div>
 
       {/* Sidebar (Desktop) */}
-      <aside className="w-72 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col hidden md:flex z-20 shadow-2xl relative">
-        <div className="mb-10 px-2 flex items-center gap-3 group cursor-default">
-          <div className="w-10 h-10 bg-gradient-to-br from-aws-orange to-red-600 rounded-xl shadow-lg shadow-orange-500/20 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
-            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-white tracking-tight leading-none">CloudFlow</h1>
-            <div className="text-[10px] text-slate-500 font-mono tracking-widest uppercase mt-1">Roadmap OS</div>
-          </div>
-        </div>
-
-        <nav className="flex-1 space-y-2">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 mb-2">Menu</div>
-          <NavItem view="DASHBOARD" icon={HomeIcon} label="Dashboard" />
-          <NavItem view="ROADMAP" icon={MapIcon} label="Roadmap" />
-          <NavItem view="SCHEDULE" icon={CalendarIcon} label="Schedule" />
-          <NavItem view="TOOLS" icon={ToolIcon} label="Tools" />
-          <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />
-        </nav>
-
-        <div className="mt-auto space-y-4">
-          <NavItem view="SETTINGS" icon={SettingsIcon} label="Settings" />
-
-          {/* Target Card */}
-          <div className="p-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-white/5 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-aws-orange/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Current Target</div>
-              <div className="font-bold text-white mb-1 group-hover:text-aws-orange transition-colors">AWS Cloud Prac.</div>
-              <div className="text-xs text-slate-500">Deadline: <span className="text-slate-300">{phases[0].milestone.date}</span></div>
+      {!isImmersive && (
+        <aside className="w-72 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col hidden md:flex z-20 shadow-2xl relative">
+          <div className="mb-10 px-2 flex items-center gap-3 group cursor-default">
+            <div className="w-10 h-10 bg-gradient-to-br from-aws-orange to-red-600 rounded-xl shadow-lg shadow-orange-500/20 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500">
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-white tracking-tight leading-none">CloudFlow</h1>
+              <div className="text-[10px] text-slate-500 font-mono tracking-widest uppercase mt-1">Roadmap OS</div>
             </div>
           </div>
-        </div>
-      </aside>
+
+          <nav className="flex-1 space-y-2">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 mb-2">Menu</div>
+            <NavItem view="DASHBOARD" icon={HomeIcon} label="Dashboard" />
+            <NavItem view="ROADMAP" icon={MapIcon} label="Roadmap" />
+            <NavItem view="SCHEDULE" icon={CalendarIcon} label="Schedule" />
+            <NavItem view="TOOLS" icon={ToolIcon} label="Tools" />
+            <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />
+          </nav>
+
+          <div className="mt-auto space-y-4">
+            <NavItem view="SETTINGS" icon={SettingsIcon} label="Settings" />
+
+            {/* Target Card */}
+            <div className="p-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-white/5 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-aws-orange/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Current Target</div>
+                <div className="font-bold text-white mb-1 group-hover:text-aws-orange transition-colors">AWS Cloud Prac.</div>
+                <div className="text-xs text-slate-500">Deadline: <span className="text-slate-300">{phases[0].milestone.date}</span></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      )}
 
       {/* Main Content - min-w-0 so it can shrink to viewport on mobile (fixes overflow for long course titles) */}
       <main className="flex-1 flex flex-col h-screen relative min-w-0 z-10">
         {/* Top Bar with User Stats */}
-        <div className="bg-slate-950/80 backdrop-blur-lg border-b border-white/5 p-4 md:px-8 flex justify-between items-center z-30 sticky top-0 transition-all">
-          <div className="md:hidden flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-aws-orange to-red-500 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            </div>
-            <span className="font-bold text-lg text-white">CloudFlow</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-            <span className="text-slate-500">View:</span>
-            <span className="text-white bg-white/5 px-3 py-1 rounded-full border border-white/5">
-              {currentView === 'DASHBOARD' ? "Overview" :
-                currentView === 'COURSE_DETAIL' ? "Study Mode" :
-                  currentView.charAt(0) + currentView.slice(1).toLowerCase()}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            {settings.notificationsEnabled && (
-              <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 bg-slate-900/50 px-3 py-1.5 rounded-full border border-white/5">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                {settings.reminderTime}
+        {!isImmersive && (
+          <div className="bg-slate-950/80 backdrop-blur-lg border-b border-white/5 p-4 md:px-8 flex justify-between items-center z-30 sticky top-0 transition-all">
+            <div className="md:hidden flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-aws-orange to-red-500 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
-            )}
-            <UserStats profile={userProfile} onClick={() => setCurrentView('REWARDS')} />
-          </div>
-        </div>
+              <span className="font-bold text-lg text-white">CloudFlow</span>
+            </div>
 
-        <div className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto pb-32 md:pb-0 scroll-smooth">
+            <div className="hidden md:flex items-center gap-4 text-sm font-medium">
+              <span className="text-slate-500">View:</span>
+              <span className="text-white bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                {currentView === 'DASHBOARD' ? "Overview" :
+                  currentView === 'COURSE_DETAIL' ? "Study Mode" :
+                    currentView.charAt(0) + currentView.slice(1).toLowerCase()}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-6">
+              {settings.notificationsEnabled && (
+                <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 bg-slate-900/50 px-3 py-1.5 rounded-full border border-white/5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  {settings.reminderTime}
+                </div>
+              )}
+              <UserStats profile={userProfile} onClick={() => setCurrentView('REWARDS')} />
+            </div>
+          </div>
+        )}
+
+        <div className={`flex-1 min-w-0 ${isImmersive ? 'h-screen' : 'overflow-x-hidden overflow-y-auto pb-32 md:pb-0 scroll-smooth'}`}>
           {currentView === 'DASHBOARD' && (
             <div className="p-4 md:p-8 max-w-7xl mx-auto">
               <header className="mb-6 md:mb-8">
@@ -485,8 +495,8 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'FOCUS' && (
-            <div className="p-4 md:p-8 pb-32 md:pb-8 h-full flex flex-col">
-              <FocusDashboard />
+            <div className={isImmersive ? "h-full flex flex-col" : "p-4 md:p-8 pb-32 md:pb-8 h-full flex flex-col"}>
+              <FocusDashboard onToggleImmersive={setIsImmersive} />
             </div>
           )}
 
@@ -507,10 +517,9 @@ const App: React.FC = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <MobileNav currentView={currentView} onChange={setCurrentView} />
+        {!isImmersive && <MobileNav currentView={currentView} onChange={setCurrentView} />}
       </main >
     </div >
   );
 };
-
 export default App;
