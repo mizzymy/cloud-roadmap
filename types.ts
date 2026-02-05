@@ -50,6 +50,9 @@ export interface Course {
   completedModules: number;
   modules: Module[]; // Expanded structure
   achievements: Achievement[];
+  isEnabled?: boolean;
+  isCustom?: boolean;
+  tracking?: MetricTracking;
 }
 
 export interface Phase {
@@ -139,4 +142,31 @@ export interface StudyWorkbook {
   tasks: StudyTask[];
   notes: string; // Markdown/Text content
   lastUpdated: number;
+}
+
+export interface MetricTracking {
+  mode: 'TIME' | 'QUANTITY'; // TIME (minutes), QUANTITY (items)
+  unit: string; // 'minutes', 'words', 'lessons'
+  current: number; // accumulated value
+  target?: number; // Optional goal (e.g. 500 words)
+  dailyTarget?: number; // Optional daily goal
+  history: { date: string, value: number }[]; // Log entries
+}
+
+export type RoadmapTheme = 'ORANGE' | 'BLUE' | 'PURPLE' | 'GREEN';
+
+export interface Roadmap {
+  id: string;
+  title: string;
+  description: string;
+  theme: RoadmapTheme;
+  phases: Phase[];
+  resources: Resource[];
+  presetLinks: PresetLink[];
+  config: {
+    startDate: number;
+    deadline: number;
+  };
+  createdAt: number;
+  lastActive: number;
 }
