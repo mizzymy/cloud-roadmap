@@ -12,6 +12,7 @@ import { INITIAL_PHASES, PRESET_LINKS_DEFAULT } from './constants';
 import { Phase, Resource, Course, UserProfile, AppSettings, PresetLink } from './types';
 import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, ClockIcon, SettingsIcon } from './components/Icons';
 import { FocusDashboard } from './components/FocusDashboard';
+import { ProjectionWidget } from './components/ProjectionWidget';
 
 type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'FOCUS' | 'COURSE_DETAIL' | 'SETTINGS' | 'REWARDS';
 
@@ -403,8 +404,8 @@ const App: React.FC = () => {
                   />
                 </div>
 
-                {/* Quick Stats - Full Width Row */}
-                <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                {/* Quick Stats - Split Row */}
+                <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-slate-850 p-6 rounded-xl border border-slate-700 hover:border-aws-orange/30 transition">
                     <div className="text-slate-400 text-sm mb-1">Total Lessons</div>
                     <div className="text-2xl font-bold text-white">{calculateCompletedTasks()} / {calculateTotalTasks()}</div>
@@ -417,6 +418,11 @@ const App: React.FC = () => {
                     <div className="text-2xl font-bold text-white">{userProfile.xp} XP</div>
                     <div className="text-xs text-green-400 mt-2">Level {userProfile.level}</div>
                   </div>
+                </div>
+
+                {/* Projection Widget - Full Width */}
+                <div className="lg:col-span-3">
+                  <ProjectionWidget phases={phases} startDate={userProfile.startDate} />
                 </div>
 
                 {/* Active Phase Preview */}

@@ -7,24 +7,46 @@ import { TutorialOverlay } from './TutorialOverlay';
 import { useTutorial } from './useTutorial';
 import { GRID_SIZE, TILE_SIZE, Vector2D, TOWER_STATS, Tower } from './types';
 import { getRandomQuestion, checkAnswer } from './QuestionIntegration';
-import { Shield, Server, Database, Globe, Play, Pause, RefreshCw, X, Zap, ArrowUpCircle, Trophy, Box, CheckCircle, XCircle, HelpCircle, AlertTriangle } from 'lucide-react';
+import { Shield, Server, Database, Globe, Play, Pause, RefreshCw, X, Zap, ArrowUpCircle, Trophy, Box, CheckCircle, XCircle, HelpCircle, AlertTriangle, Activity, Cpu, Lock, ShieldAlert } from 'lucide-react';
 import { ExamQuestion } from '../data/exams/types';
 
-const INITIAL_PATH: Vector2D[] = [
-    { x: 0, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 4 }, { x: 5, y: 4 },
-    { x: 5, y: 2 }, { x: 8, y: 2 }, { x: 8, y: 7 }, { x: 4, y: 7 },
-    { x: 4, y: 9 }, { x: 9, y: 9 }
+export const MAP_PATHS: Vector2D[][] = [
+    [ // Map 0: Standard
+        { x: 0, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 4 }, { x: 5, y: 4 },
+        { x: 5, y: 2 }, { x: 8, y: 2 }, { x: 8, y: 7 }, { x: 4, y: 7 },
+        { x: 4, y: 9 }, { x: 9, y: 9 }
+    ],
+    [ // Map 1: The Spiral
+        { x: 0, y: 0 }, { x: 9, y: 0 }, { x: 9, y: 9 }, { x: 0, y: 9 },
+        { x: 0, y: 2 }, { x: 7, y: 2 }, { x: 7, y: 7 }, { x: 2, y: 7 },
+        { x: 2, y: 4 }, { x: 5, y: 4 }, { x: 5, y: 5 }
+    ],
+    [ // Map 2: The S-Curve
+        { x: 0, y: 2 }, { x: 8, y: 2 }, { x: 8, y: 4 }, { x: 1, y: 4 },
+        { x: 1, y: 6 }, { x: 8, y: 6 }, { x: 8, y: 8 }, { x: 0, y: 8 }
+    ]
 ];
+
+export const INITIAL_PATH: Vector2D[] = MAP_PATHS[0];
 
 const CloudDefender: React.FC = () => {
     const rewards = useGameRewards();
+    const [hasWon, setHasWon] = useState(false); // Added for setHasWon in onWaveComplete
     const { gameState, setGameState, placeTower, upgradeTower, repairTower } = useGameLoop(
         INITIAL_PATH,
         {
-            onWaveComplete: (wave) => rewards.recordWaveComplete(wave),
-            onEnemyKilled: (type) => rewards.recordKill(type)
+            onWaveComplete: (wave) => {
+                if (wave % 10 === 0) {
+                    // Boss Down!
+                    setHasWon(false); // Just keep going
+                }
+            },
+            onEnemyKilled: (type) => {
+                // Tracking total kills for something?
+            }
         },
-        rewards.stats.upgrades
+        rewards.stats.upgrades,
+        MAP_PATHS
     );
 
     // UI State
@@ -119,6 +141,10 @@ const CloudDefender: React.FC = () => {
     const closeTutorial = () => {
         setShowTutorial(false);
         setGameState(prev => ({ ...prev, isPlaying: true }));
+    };
+
+    const startWave = () => {
+        setGameState(prev => ({ ...prev, waveTimer: 0, waveStatus: 'SPAWNING' }));
     };
 
     const handleGridClick = (x: number, y: number) => {
@@ -240,8 +266,13 @@ const CloudDefender: React.FC = () => {
                         </span>
                     </div>
                     <div className="flex flex-col items-center lg:items-start" id="cd-hud-budget">
-                        <span className="text-xs text-slate-400 uppercase tracking-widest">Budget</span>
-                        <span className="text-2xl font-bold font-mono text-yellow-400">${gameState.budget}</span>
+                        <span className="text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                            Budget
+                            {gameState.budgetLockedUntil && <Lock size={12} className="text-red-500 animate-pulse" />}
+                        </span>
+                        <span className={`text-2xl font-bold font-mono transition-colors ${gameState.budgetLockedUntil ? 'text-red-500 line-through opacity-50' : 'text-yellow-400'}`}>
+                            ${gameState.budget}
+                        </span>
                     </div>
                     <div className="flex flex-col items-center lg:items-start">
                         <span className="text-xs text-slate-400 uppercase tracking-widest">Wave</span>
@@ -272,17 +303,34 @@ const CloudDefender: React.FC = () => {
                         <Box size={20} className="text-purple-400" />
                         LAB
                     </button>
+                    <div className="flex flex-col items-center lg:items-end justify-center">
+                        {(gameState.wave % 10 === 0 && gameState.wave > 0) && (
+                            <div className="text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mb-1">
+                                Boss Threat Level: High
+                            </div>
+                        )}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={togglePlay}
+                                className={`p-3 rounded-lg flex items-center gap-2 font-bold transition-all ${gameState.isPlaying
+                                    ? 'bg-amber-500/20 text-amber-500 hover:bg-amber-500/30'
+                                    : 'bg-green-500 hover:bg-green-400 text-white shadow-lg shadow-green-500/20'
+                                    }`}
+                            >
+                                {gameState.isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                                {gameState.isPlaying ? 'PAUSE' : 'RESUME'}
+                            </button>
 
-                    <button
-                        onClick={togglePlay}
-                        className={`p-3 rounded-lg flex items-center gap-2 font-bold transition-all ${gameState.isPlaying
-                            ? 'bg-amber-500/20 text-amber-500 hover:bg-amber-500/30'
-                            : 'bg-green-500 hover:bg-green-400 text-white shadow-lg shadow-green-500/20'
-                            }`}
-                    >
-                        {gameState.isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                        {gameState.isPlaying ? 'PAUSE' : 'DEPLOY'}
-                    </button>
+                            {gameState.waveStatus === 'BETWEEN_WAVES' && gameState.isPlaying && (
+                                <button
+                                    onClick={startWave}
+                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-black tracking-widest shadow-lg shadow-blue-900/40 animate-pulse border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all"
+                                >
+                                    DEPLOY NOW
+                                </button>
+                            )}
+                        </div>
+                    </div>
                     <button
                         onClick={() => window.location.reload()}
                         className="p-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300"
@@ -311,111 +359,200 @@ const CloudDefender: React.FC = () => {
 
             {/* Main Game Area */}
             <div className="flex flex-col lg:flex-row flex-1 gap-4 overflow-hidden">
-                {/* The Grid / Map */}
-                <div className="flex-1 bg-slate-950 rounded-xl border border-slate-800 relative overflow-auto lg:overflow-hidden flex items-center justify-center min-h-[400px]">
+                {/* Game Grid Container */}
+                <div className="flex-1 min-h-[400px] lg:h-full relative bg-slate-950 rounded-2xl border-2 border-slate-800 shadow-2xl overflow-hidden cursor-crosshair group">
+                    {/* Circuit Board Pattern */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                        backgroundImage: `
+                            linear-gradient(to right, #1e293b 1px, transparent 1px),
+                            linear-gradient(to bottom, #1e293b 1px, transparent 1px),
+                            radial-gradient(circle at 2px 2px, #334155 1px, transparent 0)
+                        `,
+                        backgroundSize: `${TILE_SIZE}px ${TILE_SIZE}px, ${TILE_SIZE}px ${TILE_SIZE}px, ${TILE_SIZE}px ${TILE_SIZE}px`
+                    }} />
 
-                    {/* Grid Rendering */}
+                    {/* Path Indicators */}
+                    {gameState.path.map((node, i) => (
+                        <div
+                            key={`path-${i}`}
+                            className="absolute bg-slate-800/40 border border-slate-700/50 pointer-events-none"
+                            style={{
+                                left: node.x * TILE_SIZE,
+                                top: node.y * TILE_SIZE,
+                                width: TILE_SIZE,
+                                height: TILE_SIZE
+                            }}
+                        >
+                            <div className="absolute inset-2 bg-blue-500/5 rounded-full animate-pulse" />
+                        </div>
+                    ))}
+
                     <div
-                        className="relative bg-grid-pattern cursor-crosshair"
+                        className="relative mx-auto mt-8 lg:mt-0"
                         style={{
                             width: GRID_SIZE * TILE_SIZE,
                             height: GRID_SIZE * TILE_SIZE,
-                            backgroundImage: 'radial-gradient(circle, #1e293b 1px, transparent 1px)',
-                            backgroundSize: '20px 20px'
+                            backgroundImage: `
+                                linear-gradient(rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+                                linear-gradient(90deg, rgba(30, 41, 59, 0.4) 1px, transparent 1px)
+                            `,
+                            backgroundSize: `${TILE_SIZE}px ${TILE_SIZE}px`
+                        }}
+                        onClick={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = Math.floor((e.clientX - rect.left) / TILE_SIZE);
+                            const y = Math.floor((e.clientY - rect.top) / TILE_SIZE);
+                            handleGridClick(x, y);
                         }}
                     >
-                        {/* Interactive Grid Overlay for Clicks */}
-                        <div className="absolute inset-0 z-10 grid grid-cols-10 grid-rows-10">
-                            {Array.from({ length: 100 }).map((_, i) => {
-                                const x = i % 10;
-                                const y = Math.floor(i / 10);
-                                return (
-                                    <div
-                                        key={i}
-                                        id={`cd-grid-tile-${x}-${y}`}
-                                        onClick={() => handleGridClick(x, y)}
-                                        className={`hover:bg-white/5 transition-colors ${selectedCatalogTower ? 'hover:bg-green-500/20 cursor-pointer' : ''}`}
-                                    />
-                                );
-                            })}
-                        </div>
+                        {/* Grid Nodes (Click Targets) */}
+                        {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
+                            const x = i % GRID_SIZE;
+                            const y = Math.floor(i / GRID_SIZE);
+                            const isPath = gameState.path.some(p => p.x === x && p.y === y);
+                            return (
+                                <div
+                                    key={i}
+                                    id={`grid-cell-${x}-${y}`}
+                                    className={`absolute w-[64px] h-[64px] border border-slate-800/20 transition-all ${selectedCatalogTower && !isPath ? 'hover:bg-blue-500/10 hover:border-blue-500/30' : ''
+                                        }`}
+                                    style={{ left: x * TILE_SIZE, top: y * TILE_SIZE }}
+                                />
+                            );
+                        })}
 
-                        {/* Map Tiles / Path Visualization */}
-                        <svg className="absolute inset-0 pointer-events-none opacity-20" width="100%" height="100%">
-                            <polyline
-                                points={INITIAL_PATH.map(p => `${p.x * TILE_SIZE + TILE_SIZE / 2},${p.y * TILE_SIZE + TILE_SIZE / 2}`).join(' ')}
-                                fill="none"
-                                stroke="#3b82f6"
-                                strokeWidth="4"
-                            />
-                        </svg>
-
-                        {/* Towers Effect Layer */}
+                        {/* Towers Layer */}
                         {gameState.towers.map(tower => (
                             <div
                                 key={tower.id}
-                                className={`absolute flex items-center justify-center border-2 rounded-md shadow-[0_0_15px_rgba(59,130,246,0.5)] z-20 pointer-events-none transition-all
-                                    ${tower.id === selectedActiveTowerId ? 'border-amber-400 bg-amber-500/20 scale-110' : 'border-blue-500 bg-blue-900/50'}`}
+                                id={`tower-${tower.id}`}
+                                className={`absolute cursor-pointer transition-all duration-300 transform hover:scale-105 z-20 group/tower
+                                    ${selectedActiveTowerId === tower.id ? 'z-30' : ''}
+                                `}
                                 style={{
-                                    width: TILE_SIZE - 4,
-                                    height: TILE_SIZE - 4,
-                                    left: tower.position.x * TILE_SIZE + 2,
-                                    top: tower.position.y * TILE_SIZE + 2,
+                                    left: tower.position.x * TILE_SIZE,
+                                    top: tower.position.y * TILE_SIZE,
+                                    width: TILE_SIZE,
+                                    height: TILE_SIZE
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedActiveTowerId(tower.id);
+                                    setSelectedCatalogTower(null);
                                 }}
                             >
-                                {tower.type === 'ALB' && <Server size={24} className="text-blue-300" />}
-                                {tower.type === 'WAF' && <Shield size={24} className="text-purple-300" />}
-                                {tower.type === 'RDS' && <Database size={24} className="text-orange-300" />}
-                                {tower.type === 'S3' && <Globe size={24} className="text-green-300" />}
-                                <div className="absolute -bottom-2 -right-2 bg-slate-900 text-[10px] px-1 rounded border border-slate-700 font-mono">v{tower.level}</div>
+                                {/* Tower Base Halo */}
+                                <div className={`absolute inset-0 rounded-full blur-md opacity-20 group-hover/tower:opacity-40 transition-opacity ${tower.status === 'DISABLED' ? 'bg-red-500' : 'bg-blue-500'
+                                    }`} />
 
-                                {/* Integrity Bar */}
-                                <div className="absolute -top-3 left-0 w-full h-1 bg-slate-700 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full transition-all duration-500 ${tower.integrity < tower.maxIntegrity * 0.3 ? 'bg-red-500' : 'bg-green-500'}`}
-                                        style={{ width: `${(tower.integrity / tower.maxIntegrity) * 100}%` }}
-                                    />
-                                </div>
-                                {tower.status === 'DISABLED' && (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-md text-red-500 font-bold animate-pulse">
-                                        <XCircle size={32} />
+                                <div className={`relative w-full h-full flex flex-col items-center justify-center rounded-xl border-2 shadow-lg backdrop-blur-sm
+                                    ${selectedActiveTowerId === tower.id ? 'border-amber-400 bg-amber-400/10 shadow-amber-900/40' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500'}
+                                    ${tower.status === 'DISABLED' ? 'border-red-900 bg-red-900/20 scale-95 opacity-80' : ''}
+                                `}>
+                                    {/* Integrity Gauge */}
+                                    <div className="absolute -top-1 left-1 right-1 h-1 bg-slate-950 rounded-full overflow-hidden border border-slate-700">
+                                        <div
+                                            className={`h-full transition-all duration-300 ${tower.integrity < 30 ? 'bg-red-500' : 'bg-green-500'}`}
+                                            style={{ width: `${(tower.integrity / tower.maxIntegrity) * 100}%` }}
+                                        />
                                     </div>
-                                )}
+
+                                    {tower.type === 'ALB' && <Globe className={tower.status === 'DISABLED' ? 'text-slate-600' : 'text-blue-400'} size={24} />}
+                                    {tower.type === 'WAF' && <Shield className={tower.status === 'DISABLED' ? 'text-slate-600' : 'text-orange-400'} size={24} />}
+                                    {tower.type === 'SHIELD' && <Lock className={tower.status === 'DISABLED' ? 'text-slate-600' : 'text-purple-400'} size={24} />}
+                                    {tower.type === 'RDS' && <Database className={tower.status === 'DISABLED' ? 'text-slate-600' : 'text-emerald-400'} size={24} />}
+                                    {tower.type === 'S3' && <Box className={tower.status === 'DISABLED' ? 'text-slate-600' : 'text-yellow-400'} size={24} />}
+
+                                    <div className="text-[10px] font-bold mt-1 text-slate-400">v{tower.level}</div>
+
+                                    {tower.disabledUntil && (
+                                        <div className="absolute inset-0 bg-red-500/20 animate-pulse flex items-center justify-center rounded-xl">
+                                            <Zap className="text-red-500" size={16} />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
-
                         {/* Enemies Layer */}
                         {gameState.enemies.map(enemy => (
                             <div
                                 key={enemy.id}
-                                className={`absolute flex items-center justify-center shadow-lg transition-transform duration-100 ease-linear z-20 pointer-events-none
-                                    ${enemy.type === 'REQUEST_BOT' ? 'w-8 h-8 bg-red-500 rounded-full shadow-red-500/50' : ''}
-                                    ${enemy.type === 'DDOS_SWARM' ? 'w-5 h-5 bg-orange-400 rotate-45 rounded-sm shadow-orange-400/50' : ''}
-                                    ${enemy.type === 'SQL_SNAKE' ? 'w-9 h-9 bg-purple-600 rounded-md border-2 border-purple-400 shadow-purple-600/50' : ''}
-                                    ${enemy.type === 'CRYPTO_MINER' ? 'w-10 h-10 bg-emerald-600 rotate-45 border-2 border-emerald-400 shadow-emerald-500/50' : ''}
-                                `}
+                                className={`absolute flex items-center justify-center transition-all duration-100 ease-linear ${enemy.isBoss ? 'z-30' : 'z-20'} pointer-events-none`}
                                 style={{
-                                    left: enemy.position.x * TILE_SIZE + 16,
-                                    top: enemy.position.y * TILE_SIZE + 16,
+                                    left: enemy.position.x * TILE_SIZE + (enemy.isBoss ? 0 : 16),
+                                    top: enemy.position.y * TILE_SIZE + (enemy.isBoss ? 0 : 16),
                                     transform: `translate(-50%, -50%)`
                                 }}
                             >
-                                <div className="text-[8px] font-bold text-white drop-shadow-md">{enemy.health}</div>
-                                {enemy.isArmored && <div className="absolute -top-3 text-[8px] text-purple-300 font-bold">🛡️</div>}
+                                {/* Enemy Health Bar */}
+                                <div className={`absolute -top-4 ${enemy.isBoss ? 'w-20 h-2' : 'w-10 h-1'} bg-slate-800 rounded-full overflow-hidden border border-slate-700`}>
+                                    <div
+                                        className={`h-full ${enemy.isBoss ? 'bg-yellow-400' : 'bg-red-500'}`}
+                                        style={{ width: `${(enemy.health / enemy.maxHealth) * 100}%` }}
+                                    />
+                                </div>
+
+                                <div className={`flex items-center justify-center ${enemy.isBoss ? 'p-2 bg-slate-900/40 rounded-full border border-yellow-500/30' : ''}`}>
+                                    {enemy.type === 'REQUEST_BOT' && <Box size={enemy.isBoss ? 40 : 20} className="text-red-400 drop-shadow-[0_0_5px_rgba(248,113,113,0.5)]" />}
+                                    {enemy.type === 'DDOS_SWARM' && <Zap size={enemy.isBoss ? 40 : 16} className="text-orange-400 animate-pulse" />}
+                                    {enemy.type === 'SQL_SNAKE' && <Activity size={enemy.isBoss ? 40 : 24} className="text-purple-400" />}
+                                    {enemy.type === 'CRYPTO_MINER' && <Cpu size={enemy.isBoss ? 40 : 28} className="text-pink-500" />}
+                                    {enemy.type === 'THE_MONOLITH' && <Database size={48} className="text-yellow-600 drop-shadow-[0_0_10px_rgba(202,138,4,0.7)] animate-bounce" />}
+                                    {enemy.type === 'DDOS_DRAGON' && <Zap size={56} className="text-red-600 rotate-90 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] shadow-red-500" />}
+                                    {enemy.type === 'RANSOMWARE_TITAN' && <ShieldAlert size={64} className="text-red-700 animate-pulse drop-shadow-[0_0_20px_rgba(185,28,28,0.9)]" />}
+                                </div>
+
+                                {enemy.isBoss && <div className="absolute -bottom-5 text-[10px] font-black text-yellow-500 bg-black/60 px-2 rounded border border-yellow-500/50">BOSS</div>}
+                                {enemy.isArmored && !enemy.isBoss && <div className="absolute -top-6 text-[8px] text-purple-300 font-bold">🛡️</div>}
                             </div>
                         ))}
                         {/* Projectiles Layer */}
                         {gameState.projectiles.map(proj => (
                             <div
                                 key={proj.id}
-                                className="absolute w-2 h-2 bg-yellow-400 rounded-full shadow-[0_0_5px_rgba(250,204,21,0.8)] z-30 pointer-events-none"
+                                className="absolute z-30 pointer-events-none"
                                 style={{
                                     left: proj.position.x * TILE_SIZE + 32,
                                     top: proj.position.y * TILE_SIZE + 32,
                                     transform: `translate(-50%, -50%)`
                                 }}
+                            >
+                                <div className="w-2 h-2 bg-yellow-400 rounded-full shadow-[0_0_10px_rgba(250,204,21,1)] blur-[0.5px]" />
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-yellow-400/30 animate-ping" />
+                            </div>
+                        ))}
+
+                        {/* Particles Layer */}
+                        {gameState.particles.map(particle => (
+                            <div
+                                key={particle.id}
+                                className="absolute rounded-full pointer-events-none transition-opacity duration-100"
+                                style={{
+                                    left: particle.position.x * TILE_SIZE + 32,
+                                    top: particle.position.y * TILE_SIZE + 32,
+                                    width: particle.size,
+                                    height: particle.size,
+                                    backgroundColor: particle.color,
+                                    opacity: particle.life,
+                                    transform: 'translate(-50%, -50%)',
+                                    boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`
+                                }}
                             />
                         ))}
+
+                        {/* Map Status Indicators */}
+                        {gameState.waveStatus === 'BETWEEN_WAVES' && gameState.wave > 1 && gameState.wave % 10 === 1 && (
+                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-blue-900/20 backdrop-blur-sm animate-in fade-in duration-700 pointer-events-none">
+                                <div className="p-8 bg-slate-900/90 border-2 border-blue-500 rounded-2xl shadow-2xl text-center space-y-4 max-w-sm">
+                                    <div className="flex justify-center">
+                                        <RefreshCw size={48} className="text-blue-400 animate-spin-slow" />
+                                    </div>
+                                    <h2 className="text-2xl font-black text-blue-400 tracking-tighter uppercase italic">VPC Migration</h2>
+                                    <p className="text-slate-300 text-sm font-medium">Infrastructure decommissioned. Resources refactored for new Network Topology.</p>
+                                    <div className="text-amber-400 font-mono font-bold text-lg animate-pulse">BUDGET REFUNDED</div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Wave Status Overlay (Between Waves) */}
                         {gameState.waveStatus === 'BETWEEN_WAVES' && gameState.enemies.length === 0 && (
