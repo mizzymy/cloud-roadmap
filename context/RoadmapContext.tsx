@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Roadmap, Phase, Resource, PresetLink, RoadmapTheme, AppSettings } from '../types';
 import { SPANISH_ROADMAP } from '../components/data/spanishRoadmap';
+import { SALESFORCE_ROADMAP } from '../components/data/salesforceRoadmap';
 import { INITIAL_PHASES, PRESET_LINKS_DEFAULT } from '../constants';
 
 // --- TYPES & INTERFACES ---
@@ -168,6 +169,23 @@ export const RoadmapProvider: React.FC<{ children: ReactNode }> = ({ children })
                     deadline: SPANISH_ROADMAP.config.deadline
                 };
                 localStorage.setItem(`cloudflow_profile_${SPANISH_ROADMAP.id}`, JSON.stringify(initialProfile));
+            }
+
+            // INJECTION: Ensure Salesforce Roadmap exists
+            if (!loadedRoadmaps.find(r => r.id === SALESFORCE_ROADMAP.id)) {
+                loadedRoadmaps.push(SALESFORCE_ROADMAP);
+                localStorage.setItem(STORAGE_KEY_ROADMAPS, JSON.stringify(loadedRoadmaps));
+
+                // Initialize Profile for Salesforce roadmap
+                const initialProfile = {
+                    xp: 0,
+                    level: 1,
+                    streak: 1,
+                    lastLogin: new Date().toISOString(),
+                    startDate: SALESFORCE_ROADMAP.config.startDate,
+                    deadline: SALESFORCE_ROADMAP.config.deadline
+                };
+                localStorage.setItem(`cloudflow_profile_${SALESFORCE_ROADMAP.id}`, JSON.stringify(initialProfile));
             }
 
             setRoadmaps(loadedRoadmaps);
