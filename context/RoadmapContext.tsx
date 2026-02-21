@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { Roadmap, Phase, Resource, PresetLink, RoadmapTheme, AppSettings } from '../types';
 import { SPANISH_ROADMAP } from '../components/data/spanishRoadmap';
 import { SALESFORCE_ROADMAP } from '../components/data/salesforceRoadmap';
+import { TOUGH_MUDDER_ROADMAP } from '../components/data/toughMudderRoadmap';
 import { INITIAL_PHASES, PRESET_LINKS_DEFAULT } from '../constants';
 
 // --- TYPES & INTERFACES ---
@@ -186,6 +187,23 @@ export const RoadmapProvider: React.FC<{ children: ReactNode }> = ({ children })
                     deadline: SALESFORCE_ROADMAP.config.deadline
                 };
                 localStorage.setItem(`cloudflow_profile_${SALESFORCE_ROADMAP.id}`, JSON.stringify(initialProfile));
+            }
+
+            // INJECTION: Ensure Tough Mudder Roadmap exists
+            if (!loadedRoadmaps.find(r => r.id === TOUGH_MUDDER_ROADMAP.id)) {
+                loadedRoadmaps.push(TOUGH_MUDDER_ROADMAP);
+                localStorage.setItem(STORAGE_KEY_ROADMAPS, JSON.stringify(loadedRoadmaps));
+
+                // Initialize Profile for Tough Mudder roadmap
+                const initialProfile = {
+                    xp: 0,
+                    level: 1,
+                    streak: 1,
+                    lastLogin: new Date().toISOString(),
+                    startDate: TOUGH_MUDDER_ROADMAP.config.startDate,
+                    deadline: TOUGH_MUDDER_ROADMAP.config.deadline
+                };
+                localStorage.setItem(`cloudflow_profile_${TOUGH_MUDDER_ROADMAP.id}`, JSON.stringify(initialProfile));
             }
 
             setRoadmaps(loadedRoadmaps);

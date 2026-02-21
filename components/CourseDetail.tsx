@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Course, Module, Lesson, UserProfile } from '../types';
-import { PlayIcon, CheckCircleIcon, ClockIcon, BeakerIcon, ListIcon } from './Icons';
+import { PlayIcon, CheckCircleIcon, ClockIcon, BeakerIcon, ListIcon, ActivityIcon } from './Icons';
 import { FocusTimer } from './ToolsView';
 import { MetricTracker } from './MetricTracker';
 
@@ -180,7 +180,7 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
                             </div>
 
                             <div className="text-slate-500 shrink-0" title={lesson.type}>
-                              {lesson.type === 'LAB' ? <BeakerIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />}
+                              {lesson.type === 'LAB' ? <BeakerIcon className="w-3 h-3" /> : lesson.type === 'WORKOUT' ? <ActivityIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />}
                             </div>
 
                             <span className={`truncate ${lesson.isCompleted ? 'line-through opacity-50' : ''}`}>{lesson.title}</span>
@@ -224,7 +224,7 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
                       Module: {currentModule?.title}
                     </span>
                     <span className={`flex items-center gap-1 text-slate-900 text-[10px] md:text-xs px-2 py-1 rounded font-bold font-mono
-                         ${activeLesson.type === 'LAB' ? 'bg-green-500' : 'bg-slate-300'}`}>
+                         ${activeLesson.type === 'LAB' ? 'bg-green-500' : activeLesson.type === 'WORKOUT' ? 'bg-red-500' : 'bg-slate-300'}`}>
                       {activeLesson.type}
                     </span>
                     <span className="flex items-center gap-1 bg-slate-800 text-slate-300 text-[10px] md:text-xs px-2 py-1 rounded border border-slate-700 font-mono">
@@ -232,18 +232,31 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
                     </span>
                   </div>
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">{activeLesson.title}</h2>
-                  <a
-                    href={course.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`w-full md:w-auto inline-flex justify-center items-center gap-2 px-6 py-4 rounded-lg font-bold transition shadow-lg 
-                         ${activeLesson.type === 'LAB'
-                        ? 'bg-green-600 hover:bg-green-500 text-white shadow-green-500/20'
-                        : 'bg-aws-orange hover:bg-orange-500 text-slate-900 shadow-orange-500/20'}`}
-                  >
-                    {activeLesson.type === 'LAB' ? <BeakerIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
-                    {activeLesson.type === 'LAB' ? 'Start Lab Session' : 'Watch Lesson'}
-                  </a>
+                  {activeLesson.type === 'WORKOUT' ? (
+                    <button
+                      onClick={() => handleToggleLesson(currentModule?.id || '', activeLesson.id)}
+                      className={`w-full md:w-auto inline-flex justify-center items-center gap-2 px-6 py-4 rounded-lg font-bold transition shadow-lg 
+                        ${activeLesson.isCompleted
+                          ? 'bg-green-600 hover:bg-green-500 text-white shadow-green-500/20'
+                          : 'bg-red-600 hover:bg-red-500 text-white shadow-red-500/20'}`}
+                    >
+                      {activeLesson.isCompleted ? <CheckCircleIcon className="w-5 h-5" /> : <ActivityIcon className="w-5 h-5" />}
+                      {activeLesson.isCompleted ? 'Workout Completed' : 'Mark as Complete'}
+                    </button>
+                  ) : (
+                    <a
+                      href={course.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`w-full md:w-auto inline-flex justify-center items-center gap-2 px-6 py-4 rounded-lg font-bold transition shadow-lg 
+                           ${activeLesson.type === 'LAB'
+                          ? 'bg-green-600 hover:bg-green-500 text-white shadow-green-500/20'
+                          : 'bg-aws-orange hover:bg-orange-500 text-slate-900 shadow-orange-500/20'}`}
+                    >
+                      {activeLesson.type === 'LAB' ? <BeakerIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
+                      {activeLesson.type === 'LAB' ? 'Start Lab Session' : 'Watch Lesson'}
+                    </a>
+                  )}
                 </div>
                 <div className="w-full md:w-80 shrink-0 min-w-0">
                   <FocusTimer />

@@ -16,7 +16,7 @@ export interface Lesson {
   id: string;
   title: string;
   duration: string; // e.g. "15m"
-  type: 'VIDEO' | 'LAB' | 'QUIZ';
+  type: 'VIDEO' | 'LAB' | 'QUIZ' | 'WORKOUT';
   isCompleted: boolean;
   notes: Note[];
 }
