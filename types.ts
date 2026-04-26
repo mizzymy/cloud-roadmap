@@ -155,11 +155,14 @@ export interface MetricTracking {
 
 export type RoadmapTheme = 'ORANGE' | 'BLUE' | 'PURPLE' | 'GREEN';
 
+export type RoadmapCategory = 'CLOUD_CAREER' | 'LANGUAGE' | 'FITNESS' | 'GENERAL';
+
 export interface Roadmap {
   id: string;
   title: string;
   description: string;
   theme: RoadmapTheme;
+  category?: RoadmapCategory;
   phases: Phase[];
   resources: Resource[];
   presetLinks: PresetLink[];

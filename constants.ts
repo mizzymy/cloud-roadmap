@@ -1618,13 +1618,215 @@ const RESUME_CHALLENGE_MODULES = [
   }
 ];
 
+// DrawWarm AWS Hosting Project Modules
+const DRAWWARM_HOSTING_MODULES = [
+  {
+    id: 'm-dw-1',
+    title: 'Module 1: Godot Web Export',
+    isCompleted: false,
+    lessons: [
+      l('Build Godot project for web export', '2h', 'LAB'),
+      l('Configure export_presets.cfg for HTML5', '30m'),
+      l('Test locally with SharedArrayBuffer headers', '1h', 'LAB'),
+      l('Fix ResourceLoader.exists() for web build', '30m')
+    ]
+  },
+  {
+    id: 'm-dw-2',
+    title: 'Module 2: S3 Static Hosting',
+    isCompleted: false,
+    lessons: [
+      l('Create S3 bucket for static website', '30m', 'LAB'),
+      l('Configure bucket policy (public read)', '20m', 'LAB'),
+      l('Enable static website hosting', '15m', 'LAB'),
+      l('Upload DrawWarm build files', '30m', 'LAB'),
+      l('Test S3 website endpoint', '15m', 'LAB')
+    ]
+  },
+  {
+    id: 'm-dw-3',
+    title: 'Module 3: CloudFront CDN',
+    isCompleted: false,
+    lessons: [
+      l('Create CloudFront distribution', '30m', 'LAB'),
+      l('Configure origin to S3 bucket', '20m', 'LAB'),
+      l('Set custom response headers (SharedArrayBuffer)', '30m', 'LAB'),
+      l('Invalidate cache on deploy', '15m', 'LAB'),
+      l('Test global performance', '15m')
+    ]
+  },
+  {
+    id: 'm-dw-4',
+    title: 'Module 4: Domain & SSL',
+    isCompleted: false,
+    lessons: [
+      l('Register domain with Route 53', '20m', 'LAB'),
+      l('Request ACM SSL Certificate', '15m', 'LAB'),
+      l('Validate domain ownership (DNS)', '15m', 'LAB'),
+      l('Attach certificate to CloudFront', '15m', 'LAB'),
+      l('Create Route 53 alias record', '10m', 'LAB'),
+      l('Verify HTTPS access', '10m')
+    ]
+  },
+  {
+    id: 'm-dw-5',
+    title: 'Module 5: CI/CD Pipeline',
+    isCompleted: false,
+    lessons: [
+      l('Create GitHub repository for DrawWarm', '15m', 'LAB'),
+      l('Write GitHub Actions deploy workflow', '1h', 'LAB'),
+      l('Configure AWS credentials in GitHub Secrets', '15m', 'LAB'),
+      l('Test push-to-deploy pipeline', '30m', 'LAB'),
+      l('Add CloudFront cache invalidation to pipeline', '15m', 'LAB')
+    ]
+  },
+  {
+    id: 'm-dw-6',
+    title: 'Module 6: Serverless Visitor Counter',
+    isCompleted: false,
+    lessons: [
+      l('Create DynamoDB table for visit count', '15m', 'LAB'),
+      l('Write Lambda function (Python) for counter API', '1h', 'LAB'),
+      l('Create API Gateway REST endpoint', '30m', 'LAB'),
+      l('Enable CORS on API Gateway', '15m', 'LAB'),
+      l('Add visitor counter to DrawWarm UI', '30m', 'LAB'),
+      l('Test end-to-end', '15m', 'LAB')
+    ]
+  }
+];
+
+// Cantrill Developer Associate Course Modules (DVA-C02) - Key topics
+const DVA_MODULES = [
+  {
+    id: 'm-dva-intro',
+    title: 'Introduction & Course Setup',
+    isCompleted: false,
+    lessons: [
+      l('Course Introduction', '5m'),
+      l('AWS Accounts & Setup', '15m', 'LAB'),
+      l('Tools & Environment Setup', '10m')
+    ]
+  },
+  {
+    id: 'm-dva-iam',
+    title: 'IAM, Accounts & AWS Organizations',
+    isCompleted: false,
+    lessons: [
+      l('IAM Identity Policies', '15m'),
+      l('IAM Users and ARNs', '10m'),
+      l('IAM Groups', '8m'),
+      l('IAM Roles', '12m'),
+      l('Service-linked Roles & PassRole', '10m'),
+      l('AWS Organizations', '12m'),
+      l('STS AssumeRole', '10m')
+    ]
+  },
+  {
+    id: 'm-dva-serverless',
+    title: 'Serverless & Application Services',
+    isCompleted: false,
+    lessons: [
+      l('Lambda In-Depth (Part 1)', '15m'),
+      l('Lambda In-Depth (Part 2)', '15m'),
+      l('Lambda Versions & Aliases', '10m'),
+      l('Lambda Environment Variables', '8m'),
+      l('Lambda Layers', '10m'),
+      l('Lambda & VPC Networking', '12m'),
+      l('API Gateway 101', '15m'),
+      l('API Gateway Methods & Integrations', '12m'),
+      l('API Gateway Stages & Deployment', '10m'),
+      l('Step Functions', '15m'),
+      l('SQS Standard & FIFO Queues', '15m'),
+      l('SNS Topics & Subscriptions', '12m'),
+      l('EventBridge', '10m'),
+      l('SES & Cognito Overview', '10m')
+    ]
+  },
+  {
+    id: 'm-dva-dynamo',
+    title: 'DynamoDB Deep Dive',
+    isCompleted: false,
+    lessons: [
+      l('DynamoDB Architecture', '15m'),
+      l('Reading & Writing Data', '12m'),
+      l('DynamoDB Consistency Models', '10m'),
+      l('Indexes (GSI & LSI)', '15m'),
+      l('DynamoDB Streams', '12m'),
+      l('DynamoDB Accelerator (DAX)', '10m'),
+      l('DynamoDB Global Tables', '8m'),
+      l('DynamoDB TTL', '6m')
+    ]
+  },
+  {
+    id: 'm-dva-devtools',
+    title: 'Developer Tools & CI/CD',
+    isCompleted: false,
+    lessons: [
+      l('CodeCommit', '10m'),
+      l('CodeBuild Overview', '12m'),
+      l('CodeBuild Buildspec', '10m', 'LAB'),
+      l('CodeDeploy Overview', '12m'),
+      l('CodeDeploy AppSpec', '10m'),
+      l('CodePipeline', '15m'),
+      l('CodePipeline Demo', '20m', 'LAB'),
+      l('CodeArtifact', '8m'),
+      l('CloudFormation Overview', '12m'),
+      l('SAM (Serverless Application Model)', '15m'),
+      l('CDK (Cloud Development Kit)', '12m')
+    ]
+  },
+  {
+    id: 'm-dva-containers',
+    title: 'Containers & Compute',
+    isCompleted: false,
+    lessons: [
+      l('Docker Fundamentals', '15m'),
+      l('ECS Architecture', '15m'),
+      l('ECS Task Definitions', '12m'),
+      l('ECS Service & Cluster', '10m'),
+      l('ECR (Elastic Container Registry)', '8m'),
+      l('Fargate Overview', '10m'),
+      l('Elastic Beanstalk', '12m'),
+      l('EB Deployment Policies', '10m'),
+      l('EB Extensions (.ebextensions)', '10m')
+    ]
+  },
+  {
+    id: 'm-dva-monitoring',
+    title: 'Monitoring, Logging & Security',
+    isCompleted: false,
+    lessons: [
+      l('CloudWatch Logs', '12m'),
+      l('CloudWatch Metrics', '10m'),
+      l('CloudWatch Alarms', '10m'),
+      l('X-Ray Overview', '15m'),
+      l('X-Ray Instrumentation', '12m', 'LAB'),
+      l('CloudTrail', '10m'),
+      l('KMS Encryption', '15m'),
+      l('SSM Parameter Store', '10m'),
+      l('Secrets Manager', '8m'),
+      l('ACM (Certificate Manager)', '8m')
+    ]
+  },
+  {
+    id: 'm-dva-exam',
+    title: 'Exam Prep & Practice',
+    isCompleted: false,
+    lessons: [
+      l('Exam Technique & Domain Review', '30m'),
+      l('Practice Exam 1', '2h', 'QUIZ'),
+      l('Practice Exam 2', '2h', 'QUIZ')
+    ]
+  }
+];
+
 export const INITIAL_PHASES: Phase[] = [
   {
     id: 'phase-1',
-    title: 'Phase 1: The "Soft" Foundation',
-    timeframe: 'Feb 2025 – June 2025',
-    goal: 'Understand the basics without burning out.',
-    weeklyCommitment: '8-10 Hours',
+    title: 'Phase 1: Foundations Sprint ⚡',
+    timeframe: 'May 2026 – June 2026',
+    goal: 'Front-load Coursera value + Cloud Practitioner. Get job-ready basics FAST.',
+    weeklyCommitment: '12-15 Hours',
     status: PhaseStatus.ACTIVE,
     courses: [
       {
@@ -1673,11 +1875,25 @@ export const INITIAL_PHASES: Phase[] = [
           { id: 'a-cf-1', title: 'Bit Builder', description: 'Understand OSI Model', xpReward: 600, icon: '🔧' },
           { id: 'a-cf-2', title: 'DNS Detective', description: 'Understand how DNS really works', xpReward: 600, icon: '🔍' }
         ]
+      },
+      {
+        id: 'c-google-python',
+        provider: 'Coursera',
+        title: 'Google IT Automation with Python Professional Certificate',
+        url: 'https://www.coursera.org/professional-certificates/google-it-automation',
+        totalModules: 7,
+        completedModules: 0,
+        modules: GOOGLE_PYTHON_MODULES,
+        achievements: [
+          { id: 'a-py-1', title: 'Snake Charmer', description: 'Write your first Python script', xpReward: 500, icon: '🐍' },
+          { id: 'a-py-2', title: 'Git Wizard', description: 'Version Control Mastery', xpReward: 800, icon: '🐙' },
+          { id: 'a-py-3', title: 'Automation King', description: 'Automate real-world tasks', xpReward: 1200, icon: '🤖' }
+        ]
       }
     ],
     milestone: {
       name: 'AWS Certified Cloud Practitioner (CLF-C02)',
-      date: 'June 2025',
+      date: 'June 2026',
       cost: '£78 ($100)',
       completed: false,
       url: 'https://aws.amazon.com/certification/certified-cloud-practitioner/'
@@ -1685,10 +1901,10 @@ export const INITIAL_PHASES: Phase[] = [
   },
   {
     id: 'phase-2',
-    title: 'Phase 2: Core Skills & Portfolio',
-    timeframe: 'July 2025 – Jan 2026',
-    goal: 'Master the Associate level. 6 months deep dive.',
-    weeklyCommitment: '10 Hours',
+    title: 'Phase 2: SAA Deep Dive + Portfolio 🏗️',
+    timeframe: 'July 2026 – October 2026',
+    goal: 'Master AWS Associate level. Host DrawWarm on AWS as portfolio project.',
+    weeklyCommitment: '12-15 Hours',
     status: PhaseStatus.LOCKED,
     courses: [
       {
@@ -1709,23 +1925,25 @@ export const INITIAL_PHASES: Phase[] = [
         ]
       },
       {
-        id: 'c-google-python',
-        provider: 'Coursera',
-        title: 'Google IT Automation with Python Professional Certificate',
-        url: 'https://www.coursera.org/professional-certificates/google-it-automation',
-        totalModules: 7,
+        id: 'c-drawwarm-hosting',
+        provider: 'Other',
+        title: 'DrawWarm AWS Hosting (Portfolio Project)',
+        url: 'https://github.com/',
+        totalModules: DRAWWARM_HOSTING_MODULES.length,
         completedModules: 0,
-        modules: GOOGLE_PYTHON_MODULES,
+        modules: DRAWWARM_HOSTING_MODULES,
         achievements: [
-          { id: 'a-py-1', title: 'Snake Charmer', description: 'Write your first Python script', xpReward: 500, icon: '🐍' },
-          { id: 'a-py-2', title: 'Git Wizard', description: 'Version Control Mastery', xpReward: 800, icon: '🐙' },
-          { id: 'a-py-3', title: 'Automation King', description: 'Automate real-world tasks', xpReward: 1200, icon: '🤖' }
+          { id: 'a-dw-1', title: 'S3 Deployer', description: 'Host DrawWarm on S3 Static Website', xpReward: 1500, icon: '🪣' },
+          { id: 'a-dw-2', title: 'CDN Pro', description: 'Add CloudFront distribution', xpReward: 2000, icon: '🌐' },
+          { id: 'a-dw-3', title: 'Domain Owner', description: 'Custom domain with HTTPS', xpReward: 1500, icon: '🔒' },
+          { id: 'a-dw-4', title: 'Pipeline Engineer', description: 'Push-to-deploy CI/CD', xpReward: 2500, icon: '🚀' },
+          { id: 'a-dw-5', title: 'Full Stack Cloud', description: 'Lambda + API Gateway + DynamoDB', xpReward: 3000, icon: '⚡' }
         ]
       }
     ],
     milestone: {
       name: 'AWS Solutions Architect Associate (SAA-C03)',
-      date: 'Jan 2026',
+      date: 'October 2026',
       cost: '£117 ($150)',
       completed: false,
       url: 'https://skillbuilder.aws/category/exam-prep/solutions-architect-associate-SAA-C03'
@@ -1733,12 +1951,26 @@ export const INITIAL_PHASES: Phase[] = [
   },
   {
     id: 'phase-3',
-    title: 'Phase 3: Automation & DevOps',
-    timeframe: 'Feb 2026 – May 2026',
-    goal: 'Learn tools for £100k+ salaries (Terraform/Docker).',
-    weeklyCommitment: '10-12 Hours',
+    title: 'Phase 3: Developer + DevOps 🐳',
+    timeframe: 'November 2026 – December 2026',
+    goal: 'Second associate cert + DevOps skills. Final Coursera sprint before expiry!',
+    weeklyCommitment: '12 Hours',
     status: PhaseStatus.LOCKED,
     courses: [
+      {
+        id: 'c-cantrill-dva',
+        provider: 'Cantrill',
+        title: 'AWS Certified Developer - Associate (DVA-C02)',
+        url: 'https://learn.cantrill.io/p/aws-certified-developer-associate',
+        totalModules: DVA_MODULES.length,
+        completedModules: 0,
+        modules: DVA_MODULES,
+        achievements: [
+          { id: 'a-dva-1', title: 'Serverless Guru', description: 'Master Lambda, API Gateway & DynamoDB', xpReward: 2500, icon: '⚡' },
+          { id: 'a-dva-2', title: 'DevTools Expert', description: 'CodePipeline + CodeBuild mastery', xpReward: 2000, icon: '🔧' },
+          { id: 'a-dva-3', title: 'Container Captain', description: 'ECS, Fargate & ECR expertise', xpReward: 2000, icon: '🐳' }
+        ]
+      },
       {
         id: 'c-ibm-devops',
         provider: 'Coursera',
@@ -1769,19 +2001,19 @@ export const INITIAL_PHASES: Phase[] = [
       }
     ],
     milestone: {
-      name: 'HashiCorp Certified: Terraform Associate',
-      date: 'May 2026',
-      cost: '£55 ($70)',
+      name: 'AWS Developer Associate (DVA-C02)',
+      date: 'December 2026',
+      cost: '£117 ($150)',
       completed: false,
-      url: 'https://www.hashicorp.com/certification/terraform-associate'
+      url: 'https://skillbuilder.aws/category/exam-prep/developer-associate-DVA-C02'
     }
   },
   {
     id: 'phase-4',
-    title: 'Phase 4: The Professional Leap',
-    timeframe: 'June 2026 – June 2027',
-    goal: 'Final Boss - The Professional Cert and Job Hunting.',
-    weeklyCommitment: '12 Hours',
+    title: 'Phase 4: Professional Level 🏔️',
+    timeframe: 'January 2027 – June 2027',
+    goal: 'Final boss — SA Professional. Cantrill is lifetime, go at your pace.',
+    weeklyCommitment: '10-12 Hours',
     status: PhaseStatus.LOCKED,
     courses: [
       {

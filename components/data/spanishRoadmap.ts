@@ -5,6 +5,7 @@ export const SPANISH_ROADMAP: Roadmap = {
     title: 'Spanish Language Mastery',
     description: 'From zero to conversational fluency in 3 months using immersion and input hypothesis.',
     theme: 'GREEN',
+    category: 'LANGUAGE',
     phases: [
         {
             id: 'es-phase-1',

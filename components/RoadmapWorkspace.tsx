@@ -7,13 +7,18 @@ import SettingsView from './SettingsView';
 import { UserStats } from './Gamification';
 import { AccountabilityTracker } from './AccountabilityTracker';
 import { RewardsView } from './RewardsView';
+import { JobHuntView } from './JobHuntView';
+import { ImmersionView } from './language/ImmersionView';
+import { VocabTrainerView } from './language/VocabTrainerView';
+import { RacePrepView } from './fitness/RacePrepView';
+import { WorkoutCenterView } from './fitness/WorkoutCenterView';
 import { Phase, Resource, Course, UserProfile, AppSettings, PresetLink } from '../types';
-import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, ClockIcon, SettingsIcon } from './Icons';
+import { HomeIcon, MapIcon, CalendarIcon, ToolIcon, ClockIcon, SettingsIcon, BriefcaseIcon, EarthIcon, FlashcardIcon, FlagIcon, DumbbellIcon } from './Icons';
 import { FocusDashboard } from './FocusDashboard';
 import { ProjectionWidget } from './ProjectionWidget';
 import { useRoadmap } from '../context/RoadmapContext';
 
-type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'FOCUS' | 'COURSE_DETAIL' | 'SETTINGS' | 'REWARDS';
+type View = 'DASHBOARD' | 'ROADMAP' | 'SCHEDULE' | 'TOOLS' | 'FOCUS' | 'COURSE_DETAIL' | 'SETTINGS' | 'REWARDS' | 'JOBS' | 'IMMERSION' | 'VOCAB' | 'RACE_PREP' | 'WORKOUT';
 
 export const RoadmapWorkspace: React.FC = () => {
     const { activeRoadmap, updateActiveRoadmap, selectRoadmap } = useRoadmap();
@@ -24,6 +29,11 @@ export const RoadmapWorkspace: React.FC = () => {
 
     // Derive state from activeRoadmap to avoid local duplication + sync issues
     if (!activeRoadmap) return null;
+
+    // Determine if this roadmap is career-focused (shows Job Hunt, Focus Center, Coursera countdown)
+    const isCareerRoadmap = !activeRoadmap.category || activeRoadmap.category === 'CLOUD_CAREER';
+    const isLanguageRoadmap = activeRoadmap.category === 'LANGUAGE';
+    const isFitnessRoadmap = activeRoadmap.category === 'FITNESS';
 
     // PROFILE ISOLATION: Use unique key based on roadmap ID
     const profileKey = `cloudflow_profile_${activeRoadmap.id}`;
@@ -76,7 +86,7 @@ export const RoadmapWorkspace: React.FC = () => {
         const effectiveStartMs = totalCompleted === 0 ? Date.now() : userProfile.startDate;
 
         let current = new Date(effectiveStartMs);
-        const durations = [5, 7, 4, 13]; // Month durations for the 4 phases
+        const durations = [2, 4, 2, 6]; // Month durations for the 4 accelerated phases
 
         return activeRoadmap.phases.map((p, i) => {
             // If custom roadmap doesn't follow standard 4-phase duration, fall back to existing dates if available, or default to 1 month
@@ -250,12 +260,39 @@ export const RoadmapWorkspace: React.FC = () => {
             <button onClick={() => onChange('DASHBOARD')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'DASHBOARD' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
                 <HomeIcon className="w-5 h-5" />
             </button>
+            {isCareerRoadmap && (
+                <button onClick={() => onChange('JOBS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'JOBS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
+                    <BriefcaseIcon className="w-5 h-5" />
+                </button>
+            )}
+            {isLanguageRoadmap && (
+                <button onClick={() => onChange('IMMERSION')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'IMMERSION' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
+                    <EarthIcon className="w-5 h-5" />
+                </button>
+            )}
+            {isFitnessRoadmap && (
+                <button onClick={() => onChange('RACE_PREP')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'RACE_PREP' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
+                    <FlagIcon className="w-5 h-5" />
+                </button>
+            )}
             <button onClick={() => onChange('ROADMAP')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'ROADMAP' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
                 <MapIcon className="w-5 h-5" />
             </button>
-            <button onClick={() => onChange('FOCUS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'FOCUS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
-                <ClockIcon className="w-5 h-5" />
-            </button>
+            {isCareerRoadmap && (
+                <button onClick={() => onChange('FOCUS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'FOCUS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
+                    <ClockIcon className="w-5 h-5" />
+                </button>
+            )}
+            {isLanguageRoadmap && (
+                <button onClick={() => onChange('VOCAB')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'VOCAB' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
+                    <FlashcardIcon className="w-5 h-5" />
+                </button>
+            )}
+            {isFitnessRoadmap && (
+                <button onClick={() => onChange('WORKOUT')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'WORKOUT' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
+                    <DumbbellIcon className="w-5 h-5" />
+                </button>
+            )}
             <button onClick={() => onChange('TOOLS')} className={`flex flex-col items-center p-2 rounded-xl transition-all ${currentView === 'TOOLS' ? 'text-aws-orange bg-white/5' : 'text-slate-400 hover:text-white'}`}>
                 <ToolIcon className="w-5 h-5" />
             </button>
@@ -285,10 +322,15 @@ export const RoadmapWorkspace: React.FC = () => {
                     <nav className="flex-1 space-y-2">
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 mb-2">Menu</div>
                         <NavItem view="DASHBOARD" icon={HomeIcon} label="Dashboard" />
+                        {isCareerRoadmap && <NavItem view="JOBS" icon={BriefcaseIcon} label="Job Hunt" />}
+                        {isLanguageRoadmap && <NavItem view="IMMERSION" icon={EarthIcon} label="Immersion" />}
+                        {isFitnessRoadmap && <NavItem view="RACE_PREP" icon={FlagIcon} label="Race Prep" />}
                         <NavItem view="ROADMAP" icon={MapIcon} label="Roadmap" />
                         <NavItem view="SCHEDULE" icon={CalendarIcon} label="Schedule" />
                         <NavItem view="TOOLS" icon={ToolIcon} label="Tools" />
-                        <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />
+                        {isCareerRoadmap && <NavItem view="FOCUS" icon={ClockIcon} label="Focus" />}
+                        {isLanguageRoadmap && <NavItem view="VOCAB" icon={FlashcardIcon} label="Vocab Trainer" />}
+                        {isFitnessRoadmap && <NavItem view="WORKOUT" icon={DumbbellIcon} label="Workout Center" />}
                     </nav>
 
                     <div className="mt-auto space-y-4">
@@ -322,6 +364,28 @@ export const RoadmapWorkspace: React.FC = () => {
                 <div className={`flex-1 min-w-0 ${isImmersive ? 'h-screen' : 'overflow-x-hidden overflow-y-auto pb-32 md:pb-0 scroll-smooth'}`}>
                     {currentView === 'DASHBOARD' && (
                         <div className="p-8 space-y-8">
+                            {/* Coursera Expiry Countdown Banner — only for career roadmaps */}
+                            {isCareerRoadmap && (() => {
+                                const courseraExpiry = new Date('2027-01-30');
+                                const now = new Date();
+                                const daysLeft = Math.max(0, Math.ceil((courseraExpiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+                                const isUrgent = daysLeft < 90;
+                                return (
+                                    <div className={`rounded-xl p-4 flex items-center gap-4 border ${isUrgent ? 'bg-red-500/10 border-red-500/30' : 'bg-amber-500/10 border-amber-500/20'}`}>
+                                        <span className="text-2xl">{isUrgent ? '🚨' : '⏰'}</span>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold text-white">Coursera Plus Expiry</div>
+                                            <div className={`text-xs ${isUrgent ? 'text-red-400' : 'text-amber-400'}`}>
+                                                {daysLeft} days remaining — maximize Coursera value NOW!
+                                            </div>
+                                        </div>
+                                        <div className={`text-2xl font-black tabular-nums ${isUrgent ? 'text-red-400' : 'text-amber-400'}`}>
+                                            {daysLeft}d
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
                             {/* Dashboard Content */}
                             <header>
                                 <h2 className="text-3xl font-bold text-white">Welcome, {settings.username}</h2>
@@ -388,8 +452,13 @@ export const RoadmapWorkspace: React.FC = () => {
                         />
                     )}
 
+                    {currentView === 'JOBS' && isCareerRoadmap && <JobHuntView />}
+                    {currentView === 'IMMERSION' && isLanguageRoadmap && <div className="p-8 h-full max-w-6xl mx-auto"><ImmersionView /></div>}
+                    {currentView === 'VOCAB' && isLanguageRoadmap && <div className="p-8 h-full max-w-6xl mx-auto"><VocabTrainerView /></div>}
+                    {currentView === 'RACE_PREP' && isFitnessRoadmap && <div className="p-8 h-full max-w-6xl mx-auto"><RacePrepView /></div>}
+                    {currentView === 'WORKOUT' && isFitnessRoadmap && <div className="p-8 h-full max-w-4xl mx-auto"><WorkoutCenterView /></div>}
                     {currentView === 'SCHEDULE' && <div className="max-w-6xl mx-auto"><ScheduleView /></div>}
-                    {currentView === 'FOCUS' && <div className="p-8 h-full"><FocusDashboard onToggleImmersive={setIsImmersive} /></div>}
+                    {currentView === 'FOCUS' && isCareerRoadmap && <div className="p-8 h-full"><FocusDashboard onToggleImmersive={setIsImmersive} /></div>}
 
                     {currentView === 'SETTINGS' && (
                         <SettingsView settings={settings} onSave={setSettings} onReset={handleResetProgress} />

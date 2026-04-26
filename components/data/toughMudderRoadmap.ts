@@ -302,6 +302,7 @@ export const TOUGH_MUDDER_ROADMAP: Roadmap = {
     title: 'Zero to Tough Mudder (5k & 10k)',
     description: 'A comprehensive 5-month physical training plan taking you from active job to 10k obstacle course finisher.',
     theme: 'ORANGE',
+    category: 'FITNESS',
     phases: [
         {
             id: 'tm-p1',

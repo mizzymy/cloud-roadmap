@@ -5,6 +5,7 @@ export const SALESFORCE_ROADMAP: Roadmap = {
     title: 'Salesforce Cloud',
     description: 'The High-Demand Roadmap (Architect Track). From Administrator to Agentforce Specialist.',
     theme: 'BLUE', // Blue for Salesforce
+    category: 'CLOUD_CAREER',
     phases: [
         {
             id: 'sf-phase-1',
