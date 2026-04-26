@@ -173,3 +173,33 @@ export interface Roadmap {
   createdAt: number;
   lastActive: number;
 }
+
+// --- SCHEDULE GENERATOR TYPES ---
+
+export type ScheduleSplit = 'EVEN' | 'WEEKEND_HEAVY' | 'WEEKDAY_ONLY' | 'WORKING_MAN';
+
+export interface ScheduleTopic {
+  id: string;
+  name: string;
+  color: string;
+  weight: number; // 1 to 5, higher weight means more time allocated
+}
+
+export interface ScheduleConfig {
+  hoursPerWeek: number;
+  splitPreference: ScheduleSplit;
+  topics: ScheduleTopic[];
+}
+
+export interface GeneratedSlot {
+  date: Date;
+  dayName: string;
+  dateLabel: string;
+  isToday: boolean;
+  time: string;
+  task: string;
+  type: string; // Used for generic coloring if no topic color
+  durationHours: number;
+  topicId?: string;
+  color?: string; // Hex or tailwind class for the topic
+}
