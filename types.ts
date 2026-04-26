@@ -18,6 +18,7 @@ export interface Lesson {
   duration: string; // e.g. "15m"
   type: 'VIDEO' | 'LAB' | 'QUIZ' | 'WORKOUT';
   isCompleted: boolean;
+  isSkipped?: boolean;
   notes: Note[];
 }
 
@@ -26,6 +27,7 @@ export interface Module {
   title: string;
   lessons: Lesson[];
   isCompleted: boolean;
+  isSkipped?: boolean;
 }
 
 export interface Achievement {
@@ -51,6 +53,7 @@ export interface Course {
   modules: Module[]; // Expanded structure
   achievements: Achievement[];
   isEnabled?: boolean;
+  isSkipped?: boolean;
   isCustom?: boolean;
   tracking?: MetricTracking;
 }

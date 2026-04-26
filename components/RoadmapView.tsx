@@ -2,6 +2,7 @@
 import React from 'react';
 import { Phase, PhaseStatus, Course } from '../types';
 import { CheckCircleIcon, BrainIcon, LinkIcon, TrashIcon } from './Icons';
+import { getCourseDuration, formatDuration } from '../utils';
 
 interface Props {
   phases: Phase[];
@@ -17,6 +18,16 @@ const RoadmapView: React.FC<Props> = ({ phases, onPhaseUpdate, onSelectCourse })
         completed: !currentStatus
       }
     });
+  };
+
+  const toggleCourseSkip = (e: React.MouseEvent, phaseId: string, courseId: string) => {
+    e.stopPropagation();
+    const phase = phases.find(p => p.id === phaseId);
+    if (!phase) return;
+    const updatedCourses = phase.courses.map(c => 
+      c.id === courseId ? { ...c, isSkipped: !c.isSkipped } : c
+    );
+    onPhaseUpdate(phaseId, { courses: updatedCourses });
   };
 
   return (
@@ -64,9 +75,15 @@ const RoadmapView: React.FC<Props> = ({ phases, onPhaseUpdate, onSelectCourse })
                     <h3 className="text-lg md:text-xl font-bold text-white mb-1 tracking-tight">{phase.title}</h3>
                     <p className="text-slate-400 text-xs md:text-sm mb-4 leading-relaxed">{phase.goal}</p>
                   </div>
-                  <div className="text-right hidden md:block">
-                    <span className="text-sm text-slate-400 block uppercase tracking-wider text-[10px] font-bold">Commitment</span>
-                    <span className="text-white font-mono text-lg">{phase.weeklyCommitment}</span>
+                  <div className="text-right hidden md:flex flex-col gap-2">
+                    <div>
+                      <span className="text-sm text-slate-400 block uppercase tracking-wider text-[10px] font-bold text-right">Commitment</span>
+                      <span className="text-white font-mono text-lg">{phase.weeklyCommitment}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-slate-400 block uppercase tracking-wider text-[10px] font-bold text-right">Est. Duration</span>
+                      <span className="text-aws-orange font-mono text-lg">{formatDuration(phase.courses.reduce((acc, c) => acc + getCourseDuration(c), 0))}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -81,17 +98,37 @@ const RoadmapView: React.FC<Props> = ({ phases, onPhaseUpdate, onSelectCourse })
                       <button
                         key={course.id}
                         onClick={() => onSelectCourse(course)}
-                        className="flex items-center p-3 rounded-xl bg-slate-800/40 hover:bg-white/5 transition-all duration-300 border border-white/5 hover:border-aws-orange/30 group text-left w-full hover:shadow-lg hover:-translate-y-0.5"
+                        className={`flex items-center p-3 rounded-xl bg-slate-800/40 hover:bg-white/5 transition-all duration-300 border hover:shadow-lg hover:-translate-y-0.5 group text-left w-full
+                            ${course.isSkipped ? 'border-dashed border-slate-700 opacity-60' : 'border-white/5 hover:border-aws-orange/30'}`}
                       >
                         <div className={`w-1.5 h-8 rounded-full mr-3 shadow-[0_0_8px_rgba(0,0,0,0.5)]
-                            ${course.provider === 'Coursera' ? 'bg-blue-500 shadow-blue-500/30' : course.provider === 'Cantrill' ? 'bg-purple-500 shadow-purple-500/30' : 'bg-green-500 shadow-green-500/30'}
+                            ${course.isSkipped ? 'bg-slate-600' : course.provider === 'Coursera' ? 'bg-blue-500 shadow-blue-500/30' : course.provider === 'Cantrill' ? 'bg-purple-500 shadow-purple-500/30' : 'bg-green-500 shadow-green-500/30'}
                           `}></div>
-                        <div className="flex-1 overflow-hidden min-w-0">
-                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">{course.provider}</div>
-                          <div className="text-sm font-medium text-slate-200 group-hover:text-white truncate transition-colors">{course.title}</div>
+                        <div className="flex-1 overflow-hidden min-w-0 pr-2">
+                          <div className="flex justify-between items-center mb-0.5">
+                            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{course.provider}</div>
+                            {!course.isSkipped ? (
+                              <div className="text-[10px] text-aws-orange font-mono bg-aws-orange/10 px-1.5 py-0.5 rounded border border-aws-orange/20">{formatDuration(getCourseDuration(course))}</div>
+                            ) : (
+                              <div className="text-[10px] text-slate-500 font-mono bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">SKIPPED</div>
+                            )}
+                          </div>
+                          <div className={`text-sm font-medium truncate transition-colors ${course.isSkipped ? 'text-slate-500 line-through' : 'text-slate-200 group-hover:text-white'}`}>{course.title}</div>
                         </div>
-                        <div className="text-slate-600 group-hover:text-aws-orange px-2 transition-transform duration-300 group-hover:translate-x-1">
-                          →
+                        <div 
+                          className="text-slate-500 hover:text-white px-2 transition-transform duration-300"
+                          onClick={(e) => toggleCourseSkip(e, phase.id, course.id)}
+                          title={course.isSkipped ? "Include Course" : "Skip Course"}
+                        >
+                          {course.isSkipped ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
+                          )}
                         </div>
                       </button>
                     ))}

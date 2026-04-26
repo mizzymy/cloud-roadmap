@@ -29,6 +29,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm1',
                             title: 'The Foundation (1-10)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l1', title: 'Lesson 1', duration: '5:34', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l2', title: 'Lesson 2', duration: '7:58', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -45,6 +46,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm2',
                             title: 'Word Connections (11-20)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l11', title: 'Lesson 11', duration: '10:52', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l12', title: 'Lesson 12', duration: '13:53', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -61,6 +63,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm3',
                             title: 'Verb Patterns I (21-30)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l21', title: 'Lesson 21', duration: '12:13', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l22', title: 'Lesson 22', duration: '13:10', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -77,6 +80,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm4',
                             title: 'Expression & Flow (31-40)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l31', title: 'Lesson 31', duration: '7:00', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l32', title: 'Lesson 32', duration: '9:40', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -93,6 +97,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm5',
                             title: 'Advanced Structure (41-50)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l41', title: 'Lesson 41', duration: '13:06', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l42', title: 'Lesson 42', duration: '7:04', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -109,6 +114,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm6',
                             title: 'Verb Patterns II (51-60)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l51', title: 'Lesson 51', duration: '12:19', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l52', title: 'Lesson 52', duration: '14:30', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -125,6 +131,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm7',
                             title: 'Commanding the Language (61-70)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l61', title: 'Lesson 61', duration: '7:59', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l62', title: 'Lesson 62', duration: '11:53', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -141,6 +148,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm8',
                             title: 'Past & Present (71-80)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l71', title: 'Lesson 71', duration: '12:40', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l72', title: 'Lesson 72', duration: '13:00', isCompleted: false, type: 'VIDEO', notes: [] },
@@ -157,6 +165,7 @@ export const SPANISH_ROADMAP: Roadmap = {
                         {
                             id: 'm9',
                             title: 'The Final Stretch (81-90)',
+                            isCompleted: false,
                             lessons: [
                                 { id: 'l81', title: 'Lesson 81', duration: '11:56', isCompleted: false, type: 'VIDEO', notes: [] },
                                 { id: 'l82', title: 'Lesson 82', duration: '6:44', isCompleted: false, type: 'VIDEO', notes: [] },

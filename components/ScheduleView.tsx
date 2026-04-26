@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScheduleConfig, GeneratedSlot, GeneratedDay, ScheduleSplit, ScheduleTopic } from '../types';
+import { useRoadmap } from '../context/RoadmapContext';
+import { getRoadmapDuration, getRoadmapCompletedDuration, formatDuration } from '../utils';
 import { SettingsIcon, PlusIcon, TrashIcon, CheckCircleIcon } from './Icons';
 
 // --- ICONS ---
@@ -105,18 +107,63 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedDay[] {
   const exerciseTopics = config.topics.filter(t => t.isExercise || t.name.includes("Tough Mudder"));
   const studyTopics = config.topics.filter(t => !t.isExercise && !t.name.includes("Tough Mudder"));
 
-  let studyQueue: ScheduleTopic[] = [];
-  for (const t of studyTopics) {
-      for(let i=0; i<t.weight; i++) {
-          studyQueue.push(t);
+  // 1. Calculate Daily Exercise vs Study Hours
+  let dailyStudyHours = [0,0,0,0,0,0,0];
+  let dailyExerciseHours = [0,0,0,0,0,0,0];
+  let lastExerciseDayIndex = -2;
+
+  for (let i = 0; i < 7; i++) {
+      let duration = hoursPerDay[i];
+      if (duration === 0) continue;
+
+      if (exerciseTopics.length > 0 && i > lastExerciseDayIndex + 1) {
+          const exDuration = Math.min(1, duration);
+          dailyExerciseHours[i] = exDuration;
+          duration -= exDuration;
+          lastExerciseDayIndex = i;
+      }
+      dailyStudyHours[i] = duration;
+  }
+
+  // 2. Fractional Accumulation to distribute Study Topics proportionally
+  const totalStudyHours = dailyStudyHours.reduce((a, b) => a + b, 0);
+  const totalStudyBlocks = Math.round(totalStudyHours * 2);
+  const studyTotalWeight = studyTopics.reduce((sum, t) => sum + t.weight, 0);
+  
+  let studyBlockQueue: ScheduleTopic[] = [];
+
+  if (studyTotalWeight > 0 && totalStudyBlocks > 0) {
+      let accumulators = studyTopics.map(t => t.weight);
+      for (let i = 0; i < totalStudyBlocks; i++) {
+          let maxIdx = 0;
+          let maxVal = -Infinity;
+          for (let j = 0; j < studyTopics.length; j++) {
+              if (accumulators[j] > maxVal) {
+                  maxVal = accumulators[j];
+                  maxIdx = j;
+              }
+          }
+          studyBlockQueue.push(studyTopics[maxIdx]);
+          
+          for (let j = 0; j < studyTopics.length; j++) {
+              if (j === maxIdx) {
+                  accumulators[j] -= studyTotalWeight;
+              }
+              accumulators[j] += studyTopics[j].weight;
+          }
       }
   }
 
+  // 3. Build the actual days
   const days: GeneratedDay[] = [];
-  let studyIndex = 0;
-  
-  // Ensure exercise has a rest day
-  let lastExerciseDayIndex = -2;
+  let blockQueueIndex = 0;
+
+  const formatTime = (hourDecimal: number) => {
+      let h = Math.floor(hourDecimal) % 24;
+      let m = Math.round((hourDecimal % 1) * 60);
+      if (m === 60) { h = (h + 1) % 24; m = 0; }
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  };
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(monday);
@@ -144,46 +191,65 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedDay[] {
     let slots: GeneratedSlot[] = [];
     let startHour = (i >= 5) ? 9 : 19; 
 
-    // Check if we can do exercise today
-    if (exerciseTopics.length > 0 && i > lastExerciseDayIndex + 1 && duration > 0) {
-       const exDuration = Math.min(1, duration);
-       const ex = exerciseTopics[0]; // simplistic selection of the first exercise topic
-       
-       let endHour = Math.floor(startHour + exDuration);
-       let endMin = (exDuration % 1) * 60;
-       let timeStr = `${startHour.toString().padStart(2, '0')}:${(startHour%1===0.5)?'30':'00'} - ${endHour.toString().padStart(2, '0')}:${endMin === 0 ? '00' : '30'} (${exDuration}h)`;
+    // Exercise
+    if (dailyExerciseHours[i] > 0) {
+       const exHours = dailyExerciseHours[i];
+       const ex = exerciseTopics[0]; // simplistic selection
        
        slots.push({
-         time: timeStr,
+         time: `${formatTime(startHour)} - ${formatTime(startHour + exHours)} (${exHours}h)`,
          task: ex.name,
          topicId: ex.id,
          color: ex.color,
          type: 'EXERCISE',
-         durationHours: exDuration
+         durationHours: exHours
        });
        
-       startHour += exDuration; 
-       duration -= exDuration;
-       lastExerciseDayIndex = i;
+       startHour += exHours; 
     }
 
-    // Study slot with remaining duration
-    if (duration > 0) {
-      let endHour = Math.floor(startHour + duration);
-      let endMin = (duration % 1) * 60;
-      let timeStr = `${startHour.toString().padStart(2, '0')}:${(startHour%1===0.5)?'30':'00'} - ${endHour.toString().padStart(2, '0')}:${endMin === 0 ? '00' : '30'} (${duration}h)`;
+    // Study
+    if (dailyStudyHours[i] > 0) {
+       const stHours = dailyStudyHours[i];
+       const blocksToPull = Math.round(stHours * 2);
+       
+       let currentTopic: ScheduleTopic | null = null;
+       let currentDuration = 0;
 
-      let assignedTopic = studyQueue.length > 0 ? studyQueue[studyIndex % studyQueue.length] : undefined;
-      if (assignedTopic) studyIndex++;
+       const flushSlot = () => {
+           if (currentTopic && currentDuration > 0) {
+               slots.push({
+                   time: `${formatTime(startHour)} - ${formatTime(startHour + currentDuration)} (${currentDuration}h)`,
+                   task: currentTopic.name,
+                   topicId: currentTopic.id,
+                   color: currentTopic.color,
+                   type: 'CUSTOM',
+                   durationHours: currentDuration
+               });
+               startHour += currentDuration;
+               currentDuration = 0;
+           }
+       };
 
-      slots.push({
-        time: timeStr,
-        task: assignedTopic ? assignedTopic.name : 'General Study',
-        topicId: assignedTopic?.id,
-        color: assignedTopic?.color || 'bg-slate-700/30 text-slate-400 border-slate-600',
-        type: 'CUSTOM',
-        durationHours: duration
-      });
+       for (let b = 0; b < blocksToPull; b++) {
+           let topic = studyBlockQueue[blockQueueIndex];
+           blockQueueIndex++;
+
+           // Fallback if no study topic is defined
+           if (!topic) {
+               topic = { id: 'general', name: 'General Study', color: 'bg-slate-700/30 text-slate-400 border-slate-600', weight: 1, isExercise: false };
+           }
+
+           if (currentTopic && currentTopic.id !== topic.id) {
+               flushSlot();
+               currentTopic = topic;
+               currentDuration = 0.5;
+           } else {
+               currentTopic = topic;
+               currentDuration += 0.5;
+           }
+       }
+       flushSlot();
     }
 
     days.push({
@@ -196,6 +262,8 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedDay[] {
 
 
 const ScheduleView: React.FC = () => {
+  const { roadmaps } = useRoadmap();
+  
   const [config, setConfig] = useState<ScheduleConfig>(() => {
     const saved = localStorage.getItem('cloudflow_schedule_config');
     if (saved) return JSON.parse(saved);
@@ -480,6 +548,64 @@ const SPLITS: { value: ScheduleSplit, label: string, desc: string, weights: numb
              </div>
           </div>
         ))}
+      </div>
+      
+      {/* Completion Estimates */}
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {Object.entries(
+          schedule.reduce((acc, day) => {
+            day.slots.forEach(slot => {
+              if (slot.type !== 'REST') {
+                acc[slot.task] = (acc[slot.task] || 0) + slot.durationHours;
+              }
+            });
+            return acc;
+          }, {} as Record<string, number>)
+        ).map(([topicName, hoursValue]) => {
+          const hours = hoursValue as number;
+          const matchedRoadmap = roadmaps.find(r => r.title.toLowerCase() === topicName.toLowerCase() || topicName.toLowerCase().includes(r.title.toLowerCase()) || r.title.toLowerCase().includes(topicName.toLowerCase()));
+          
+          if (!matchedRoadmap || hours === 0) return null;
+
+          const totalMinutes = getRoadmapDuration(matchedRoadmap);
+          const completedMinutes = getRoadmapCompletedDuration(matchedRoadmap);
+          const remainingMinutes = totalMinutes - completedMinutes;
+          
+          const weeksRemaining = hours > 0 ? (remainingMinutes / 60) / hours : 0;
+          const estimatedDate = new Date();
+          estimatedDate.setDate(estimatedDate.getDate() + Math.ceil(weeksRemaining) * 7);
+          const dateString = estimatedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+          
+          return (
+            <div key={topicName} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 flex items-start gap-4">
+               <div className="p-3 bg-green-500/10 rounded-xl text-green-400 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+               </div>
+              <div className="w-full">
+                 <h3 className="font-bold text-white mb-1">{topicName} Projection</h3>
+                 <p className="text-slate-400 text-sm mb-3">
+                   At <strong className="text-slate-300">{hours.toFixed(1)} hours/week</strong>, here's your estimated completion.
+                 </p>
+                 <div className="flex justify-between text-xs text-slate-500 mb-1">
+                    <span>{formatDuration(completedMinutes)} completed</span>
+                    <span>{formatDuration(totalMinutes)} total</span>
+                 </div>
+                 <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-3">
+                    <div className="h-full bg-green-500" style={{ width: `${totalMinutes > 0 ? (completedMinutes/totalMinutes)*100 : 0}%` }}></div>
+                 </div>
+                 <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div className="flex flex-col">
+                       <span className="text-sm text-slate-400">Estimated remaining time: </span>
+                       <span className="text-xs text-slate-500 font-medium">Target completion: {dateString}</span>
+                    </div>
+                    <span className="text-lg font-bold text-white">{Math.ceil(weeksRemaining)} weeks</span>
+                 </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
       
       <div className="mt-8 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 flex items-start gap-4">

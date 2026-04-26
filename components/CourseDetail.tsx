@@ -48,6 +48,26 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
     onUpdateCourse({ ...course, modules: updatedModules });
   };
 
+  const handleToggleSkipModule = (moduleId: string) => {
+    const updatedModules = course.modules.map(mod => {
+      if (mod.id !== moduleId) return mod;
+      return { ...mod, isSkipped: !mod.isSkipped };
+    });
+    onUpdateCourse({ ...course, modules: updatedModules });
+  };
+
+  const handleToggleSkipLesson = (moduleId: string, lessonId: string) => {
+    const updatedModules = course.modules.map(mod => {
+      if (mod.id !== moduleId) return mod;
+      const updatedLessons = mod.lessons.map(les => {
+        if (les.id !== lessonId) return les;
+        return { ...les, isSkipped: !les.isSkipped };
+      });
+      return { ...mod, lessons: updatedLessons };
+    });
+    onUpdateCourse({ ...course, modules: updatedModules });
+  };
+
   const handleAddNote = () => {
     if (!activeLesson || !noteContent.trim()) return;
 
@@ -82,7 +102,9 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
     let total = 0;
     let completed = 0;
     course.modules.forEach(m => {
+      if (m.isSkipped) return;
       m.lessons.forEach(l => {
+        if (l.isSkipped) return;
         total++;
         if (l.isCompleted) completed++;
       });
@@ -156,10 +178,19 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
                     <button
                       onClick={() => setActiveModuleId(module.id)}
                       className={`w-full text-left font-semibold text-sm py-2 px-3 rounded flex justify-between items-center transition
-                          ${activeModuleId === module.id ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800/50'}`}
+                          ${activeModuleId === module.id ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800/50'}
+                          ${module.isSkipped ? 'opacity-50' : ''}`}
                     >
-                      <span className="truncate pr-2">{module.title}</span>
-                      {module.lessons.every(l => l.isCompleted) && <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />}
+                      <span className={`truncate pr-2 ${module.isSkipped ? 'line-through' : ''}`}>{module.title}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleToggleSkipModule(module.id); }}
+                          className="text-[10px] px-2 py-0.5 rounded border border-slate-600 hover:border-aws-orange hover:text-aws-orange transition"
+                        >
+                          {module.isSkipped ? 'Unskip' : 'Skip'}
+                        </button>
+                        {module.lessons.filter(l => !l.isSkipped).length > 0 && module.lessons.filter(l => !l.isSkipped).every(l => l.isCompleted) && <CheckCircleIcon className="w-4 h-4 text-green-500" />}
+                      </div>
                     </button>
 
                     {activeModuleId === module.id && (
@@ -183,7 +214,13 @@ const CourseDetail: React.FC<Props> = ({ course, userProfile, onUpdateCourse, on
                               {lesson.type === 'LAB' ? <BeakerIcon className="w-3 h-3" /> : lesson.type === 'WORKOUT' ? <ActivityIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />}
                             </div>
 
-                            <span className={`truncate ${lesson.isCompleted ? 'line-through opacity-50' : ''}`}>{lesson.title}</span>
+                            <span className={`truncate ${lesson.isCompleted || lesson.isSkipped ? 'line-through opacity-50' : ''}`}>{lesson.title}</span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleToggleSkipLesson(module.id, lesson.id); }}
+                              className="text-[10px] px-1.5 py-0.5 rounded border border-slate-600 hover:border-aws-orange hover:text-aws-orange transition ml-auto shrink-0 opacity-0 group-hover:opacity-100 md:opacity-100"
+                            >
+                              {lesson.isSkipped ? 'Unskip' : 'Skip'}
+                            </button>
                           </button>
                         ))}
                       </div>
