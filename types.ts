@@ -176,7 +176,7 @@ export interface Roadmap {
 
 // --- SCHEDULE GENERATOR TYPES ---
 
-export type ScheduleSplit = 'EVEN' | 'WEEKEND_HEAVY' | 'WEEKDAY_ONLY' | 'WORKING_MAN';
+export type ScheduleSplit = 'EVEN' | 'WEEKEND_HEAVY' | 'WEEKDAY_ONLY' | 'WORKING_MAN' | 'FRONT_LOADED' | 'MWF_ONLY' | 'TTS_ONLY';
 
 export interface ScheduleTopic {
   id: string;

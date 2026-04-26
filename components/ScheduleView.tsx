@@ -28,6 +28,13 @@ const TOPIC_COLORS = [
   'bg-pink-500/20 text-pink-400 border-pink-500/50',
 ];
 
+const PREDEFINED_TOPICS = [
+  "AWS Cloud Architect",
+  "Spanish Language",
+  "Salesforce",
+  "Tough Mudder"
+];
+
 function getMondayOfWeek(d: Date): Date {
   const monday = new Date(d);
   const day = d.getDay();
@@ -49,7 +56,13 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedSlot[] {
   } else if (config.splitPreference === 'WEEKDAY_ONLY') {
     dayWeights = [2, 2, 2, 2, 2, 0, 0];
   } else if (config.splitPreference === 'WORKING_MAN') {
-    dayWeights = [1, 1, 1, 1, 0, 4, 2]; // Nothing on Friday, Heavy Saturday
+    dayWeights = [1, 1, 1, 1, 0, 4, 2];
+  } else if (config.splitPreference === 'FRONT_LOADED') {
+    dayWeights = [4, 3, 2, 1, 1, 0, 0];
+  } else if (config.splitPreference === 'MWF_ONLY') {
+    dayWeights = [1, 0, 1, 0, 1, 0, 0];
+  } else if (config.splitPreference === 'TTS_ONLY') {
+    dayWeights = [0, 1, 0, 1, 0, 1, 0];
   }
 
   const totalWeight = dayWeights.reduce((a, b) => a + b, 0);
@@ -195,7 +208,7 @@ const ScheduleView: React.FC = () => {
     const color = TOPIC_COLORS[editTopics.length % TOPIC_COLORS.length];
     setEditTopics([
       ...editTopics, 
-      { id: Date.now().toString(), name: 'New Topic', weight: 1, color }
+      { id: Date.now().toString(), name: PREDEFINED_TOPICS[0], weight: 1, color }
     ]);
   };
 
@@ -207,15 +220,15 @@ const ScheduleView: React.FC = () => {
     setEditTopics(editTopics.filter(t => t.id !== id));
   };
 
-  const getSplitDescription = (split: ScheduleSplit) => {
-    switch (split) {
-      case 'EVEN': return 'Consistent effort every day of the week.';
-      case 'WEEKEND_HEAVY': return 'Lighter weekdays, heavy push on Saturday and Sunday.';
-      case 'WEEKDAY_ONLY': return 'Push hard Mon-Fri, keep weekends totally free.';
-      case 'WORKING_MAN': return 'Micro-doses Mon-Thu, Friday off, Heavy Saturday, Light Sunday.';
-      default: return '';
-    }
-  };
+const SPLITS: { value: ScheduleSplit, label: string, desc: string, weights: number[] }[] = [
+  { value: 'WORKING_MAN', label: 'The "Working Man"', desc: 'Light Mon-Thu, Friday off, Heavy Saturday.', weights: [1, 1, 1, 1, 0, 4, 2] },
+  { value: 'WEEKEND_HEAVY', label: 'Weekend Warrior', desc: 'Heavy Sat/Sun.', weights: [1, 1, 1, 1, 1, 4, 4] },
+  { value: 'EVEN', label: 'Slow & Steady', desc: 'Evenly spread.', weights: [1, 1, 1, 1, 1, 1, 1] },
+  { value: 'WEEKDAY_ONLY', label: 'Corporate Drone', desc: 'Mon-Fri only.', weights: [2, 2, 2, 2, 2, 0, 0] },
+  { value: 'FRONT_LOADED', label: 'Front-Loaded', desc: 'Heavy Mon-Wed, tapering off.', weights: [4, 3, 2, 1, 1, 0, 0] },
+  { value: 'MWF_ONLY', label: 'Mon/Wed/Fri', desc: 'Alternating weekdays.', weights: [1, 0, 1, 0, 1, 0, 0] },
+  { value: 'TTS_ONLY', label: 'Tue/Thu/Sat', desc: 'Alternating alternate days.', weights: [0, 1, 0, 1, 0, 1, 0] },
+];
 
   if (isEditing) {
     return (
@@ -253,18 +266,40 @@ const ScheduleView: React.FC = () => {
 
           {/* Split Preference */}
           <div>
-            <label className="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Weekly Split</label>
-            <select 
-              value={editSplit}
-              onChange={(e) => setEditSplit(e.target.value as ScheduleSplit)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white font-medium focus:border-aws-orange focus:outline-none transition"
-            >
-              <option value="WORKING_MAN">The "Working Man" (Mon-Thu light, Fri off, Sat Heavy)</option>
-              <option value="WEEKEND_HEAVY">Weekend Warrior (Heavy Sat/Sun)</option>
-              <option value="EVEN">Slow & Steady (Evenly spread)</option>
-              <option value="WEEKDAY_ONLY">Corporate Drone (Mon-Fri only)</option>
-            </select>
-            <p className="text-sm text-slate-500 mt-2 ml-1">{getSplitDescription(editSplit)}</p>
+            <label className="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Weekly Split</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+               {SPLITS.map(split => {
+                  const maxW = Math.max(...split.weights);
+                  return (
+                     <button
+                        key={split.value}
+                        onClick={() => setEditSplit(split.value)}
+                        className={`text-left p-4 rounded-xl border transition-all flex flex-col gap-3
+                           ${editSplit === split.value 
+                              ? 'bg-slate-800 border-aws-orange ring-1 ring-aws-orange/50 shadow-lg' 
+                              : 'bg-slate-950 border-slate-800 hover:border-slate-700 hover:bg-slate-900/50'}`}
+                     >
+                        <div>
+                           <div className="font-bold text-white text-sm">{split.label}</div>
+                           <div className="text-xs text-slate-500 line-clamp-1">{split.desc}</div>
+                        </div>
+                        <div className="flex gap-1 h-10 items-end mt-auto pt-2 border-t border-slate-800/50 w-full">
+                           {split.weights.map((w, i) => (
+                              <div key={i} className="flex-1 flex flex-col justify-end h-full gap-1">
+                                 <div 
+                                    className={`w-full rounded-sm transition-all duration-300 ${editSplit === split.value ? 'bg-aws-orange' : 'bg-slate-600'}`}
+                                    style={{ height: w === 0 ? '4px' : `${(w / maxW) * 100}%`, opacity: w === 0 ? 0.3 : 1 }}
+                                 />
+                                 <div className="text-[8px] font-mono text-center text-slate-500">
+                                    {['M','T','W','T','F','S','S'][i]}
+                                 </div>
+                              </div>
+                           ))}
+                        </div>
+                     </button>
+                  );
+               })}
+            </div>
           </div>
 
           {/* Topics */}
@@ -283,13 +318,32 @@ const ScheduleView: React.FC = () => {
               {editTopics.map((topic, index) => (
                 <div key={topic.id} className="flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
                   <div className={`w-4 h-4 rounded-full ${topic.color.split(' ')[0]}`}></div>
-                  <input 
-                    type="text" 
-                    value={topic.name}
-                    onChange={(e) => handleUpdateTopic(topic.id, 'name', e.target.value)}
-                    className="flex-1 bg-transparent text-white focus:outline-none placeholder-slate-600 font-medium"
-                    placeholder="Topic Name..."
-                  />
+                  <div className="flex-1 flex gap-2 items-center">
+                    <select 
+                      value={PREDEFINED_TOPICS.includes(topic.name) ? topic.name : 'Custom'}
+                      onChange={(e) => {
+                        if (e.target.value === 'Custom') {
+                          handleUpdateTopic(topic.id, 'name', 'Custom Topic');
+                        } else {
+                          handleUpdateTopic(topic.id, 'name', e.target.value);
+                        }
+                      }}
+                      className="bg-transparent text-white focus:outline-none font-medium cursor-pointer"
+                    >
+                      {PREDEFINED_TOPICS.map(pt => <option key={pt} value={pt} className="bg-slate-900">{pt}</option>)}
+                      <option value="Custom" className="bg-slate-900">Custom...</option>
+                    </select>
+                    {!PREDEFINED_TOPICS.includes(topic.name) && (
+                      <input 
+                        type="text" 
+                        value={topic.name === 'Custom Topic' ? '' : topic.name}
+                        onChange={(e) => handleUpdateTopic(topic.id, 'name', e.target.value)}
+                        className="flex-1 bg-slate-900/50 border border-slate-700 px-3 py-1 rounded-lg text-white focus:outline-none focus:border-aws-orange placeholder-slate-600 font-medium text-sm transition"
+                        placeholder="Enter custom topic..."
+                        autoFocus
+                      />
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
                      <span className="text-xs text-slate-500 font-bold uppercase">Weight:</span>
                      <select 
