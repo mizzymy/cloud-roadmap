@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScheduleConfig, GeneratedSlot, ScheduleSplit, ScheduleTopic } from '../types';
+import { ScheduleConfig, GeneratedSlot, GeneratedDay, ScheduleSplit, ScheduleTopic } from '../types';
 import { SettingsIcon, PlusIcon, TrashIcon, CheckCircleIcon } from './Icons';
 
 // --- ICONS ---
@@ -29,10 +29,10 @@ const TOPIC_COLORS = [
 ];
 
 const PREDEFINED_TOPICS = [
-  "AWS Cloud Architect",
-  "Spanish Language",
-  "Salesforce",
-  "Tough Mudder"
+  { name: "AWS Cloud Architect", isExercise: false },
+  { name: "Spanish Language", isExercise: false },
+  { name: "Salesforce", isExercise: false },
+  { name: "Tough Mudder (Couch to 5k)", isExercise: true }
 ];
 
 function getMondayOfWeek(d: Date): Date {
@@ -45,7 +45,7 @@ function getMondayOfWeek(d: Date): Date {
 }
 
 // Algorithm to distribute hours
-function generateWeeklySchedule(config: ScheduleConfig): GeneratedSlot[] {
+function generateWeeklySchedule(config: ScheduleConfig): GeneratedDay[] {
   const now = new Date();
   const monday = getMondayOfWeek(now);
   
@@ -80,7 +80,6 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedSlot[] {
   // Iteratively add/subtract 0.5 to highest/lowest weights until difference is 0
   while (Math.abs(diff) > 0.1) {
       if (diff > 0) {
-          // Add 0.5 to the day with the highest weight that isn't ridiculous
           let maxIdx = 0;
           let maxW = -1;
           for(let i=0; i<7; i++) {
@@ -89,7 +88,6 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedSlot[] {
           hoursPerDay[maxIdx] += 0.5;
           diff -= 0.5;
       } else {
-          // Subtract 0.5 from the day with highest hours
           let maxIdx = 0;
           let maxH = -1;
           for(let i=0; i<7; i++) {
@@ -99,27 +97,26 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedSlot[] {
               hoursPerDay[maxIdx] -= 0.5;
               diff += 0.5;
           } else {
-              break; // Should rarely hit this
+              break;
           }
       }
   }
 
-  // Generate Topic Queue based on weight
-  let topicQueue: ScheduleTopic[] = [];
-  if (config.topics.length > 0) {
-     // A simple way to distribute topics: create a pool proportional to weights
-     // Since this is continuous through the week, we'll just cycle them.
-     // To make it prioritize correctly, we can sort by weight and allocate largest blocks to largest weights.
-     // For simplicity, we just build a repeated array proportional to weight.
-     for (const t of config.topics) {
-         for(let i=0; i<t.weight; i++) {
-             topicQueue.push(t);
-         }
-     }
+  const exerciseTopics = config.topics.filter(t => t.isExercise || t.name.includes("Tough Mudder"));
+  const studyTopics = config.topics.filter(t => !t.isExercise && !t.name.includes("Tough Mudder"));
+
+  let studyQueue: ScheduleTopic[] = [];
+  for (const t of studyTopics) {
+      for(let i=0; i<t.weight; i++) {
+          studyQueue.push(t);
+      }
   }
 
-  const slots: GeneratedSlot[] = [];
-  let topicIndex = 0;
+  const days: GeneratedDay[] = [];
+  let studyIndex = 0;
+  
+  // Ensure exercise has a rest day
+  let lastExerciseDayIndex = -2;
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(monday);
@@ -131,46 +128,70 @@ function generateWeeklySchedule(config: ScheduleConfig): GeneratedSlot[] {
       date.getMonth() === now.getMonth() &&
       date.getFullYear() === now.getFullYear();
 
-    const duration = hoursPerDay[i];
+    let duration = hoursPerDay[i];
     
     if (duration === 0) {
-      slots.push({
-        date, dayName, dateLabel, isToday, durationHours: 0,
-        time: 'Rest Day', task: 'Decompress (No Study)', type: 'REST'
+      days.push({
+        date, dayName, dateLabel, isToday, 
+        slots: [{
+          durationHours: 0,
+          time: 'Rest Day', task: 'Decompress (No Study)', type: 'REST'
+        }]
       });
       continue;
     }
 
-    // Determine default start time
-    let startTimeStr = '19:00';
-    if (i >= 5) startTimeStr = '09:00'; // Weekend morning
+    let slots: GeneratedSlot[] = [];
+    let startHour = (i >= 5) ? 9 : 19; 
 
-    let endTimeStr = ''; // Calculate based on duration
-    const startHour = parseInt(startTimeStr.split(':')[0]);
-    const endHour = Math.floor(startHour + duration);
-    const endMin = (duration % 1) * 60;
-    endTimeStr = `${endHour.toString().padStart(2, '0')}:${endMin === 0 ? '00' : '30'}`;
-
-    let timeStr = `${startTimeStr} - ${endTimeStr} (${duration}h)`;
-
-    // Assign topic
-    let assignedTopic: ScheduleTopic | undefined = undefined;
-    if (topicQueue.length > 0) {
-        assignedTopic = topicQueue[topicIndex % topicQueue.length];
-        topicIndex++;
+    // Check if we can do exercise today
+    if (exerciseTopics.length > 0 && i > lastExerciseDayIndex + 1 && duration > 0) {
+       const exDuration = Math.min(1, duration);
+       const ex = exerciseTopics[0]; // simplistic selection of the first exercise topic
+       
+       let endHour = Math.floor(startHour + exDuration);
+       let endMin = (exDuration % 1) * 60;
+       let timeStr = `${startHour.toString().padStart(2, '0')}:${(startHour%1===0.5)?'30':'00'} - ${endHour.toString().padStart(2, '0')}:${endMin === 0 ? '00' : '30'} (${exDuration}h)`;
+       
+       slots.push({
+         time: timeStr,
+         task: ex.name,
+         topicId: ex.id,
+         color: ex.color,
+         type: 'EXERCISE',
+         durationHours: exDuration
+       });
+       
+       startHour += exDuration; 
+       duration -= exDuration;
+       lastExerciseDayIndex = i;
     }
 
-    slots.push({
-      date, dayName, dateLabel, isToday, durationHours: duration,
-      time: timeStr,
-      task: assignedTopic ? assignedTopic.name : 'General Study',
-      topicId: assignedTopic?.id,
-      color: assignedTopic?.color || 'bg-slate-700/30 text-slate-400 border-slate-600',
-      type: 'CUSTOM'
+    // Study slot with remaining duration
+    if (duration > 0) {
+      let endHour = Math.floor(startHour + duration);
+      let endMin = (duration % 1) * 60;
+      let timeStr = `${startHour.toString().padStart(2, '0')}:${(startHour%1===0.5)?'30':'00'} - ${endHour.toString().padStart(2, '0')}:${endMin === 0 ? '00' : '30'} (${duration}h)`;
+
+      let assignedTopic = studyQueue.length > 0 ? studyQueue[studyIndex % studyQueue.length] : undefined;
+      if (assignedTopic) studyIndex++;
+
+      slots.push({
+        time: timeStr,
+        task: assignedTopic ? assignedTopic.name : 'General Study',
+        topicId: assignedTopic?.id,
+        color: assignedTopic?.color || 'bg-slate-700/30 text-slate-400 border-slate-600',
+        type: 'CUSTOM',
+        durationHours: duration
+      });
+    }
+
+    days.push({
+      date, dayName, dateLabel, isToday, slots
     });
   }
 
-  return slots;
+  return days;
 }
 
 
@@ -182,7 +203,7 @@ const ScheduleView: React.FC = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [schedule, setSchedule] = useState<GeneratedSlot[]>([]);
+  const [schedule, setSchedule] = useState<GeneratedDay[]>([]);
 
   // Local state for editing
   const [editHours, setEditHours] = useState(config.hoursPerWeek);
@@ -208,7 +229,7 @@ const ScheduleView: React.FC = () => {
     const color = TOPIC_COLORS[editTopics.length % TOPIC_COLORS.length];
     setEditTopics([
       ...editTopics, 
-      { id: Date.now().toString(), name: PREDEFINED_TOPICS[0], weight: 1, color }
+      { id: Date.now().toString(), name: PREDEFINED_TOPICS[0].name, weight: 1, color, isExercise: PREDEFINED_TOPICS[0].isExercise }
     ]);
   };
 
@@ -320,20 +341,25 @@ const SPLITS: { value: ScheduleSplit, label: string, desc: string, weights: numb
                   <div className={`w-4 h-4 rounded-full ${topic.color.split(' ')[0]}`}></div>
                   <div className="flex-1 flex gap-2 items-center">
                     <select 
-                      value={PREDEFINED_TOPICS.includes(topic.name) ? topic.name : 'Custom'}
+                      value={PREDEFINED_TOPICS.find(p => p.name === topic.name) ? topic.name : 'Custom'}
                       onChange={(e) => {
                         if (e.target.value === 'Custom') {
                           handleUpdateTopic(topic.id, 'name', 'Custom Topic');
+                          handleUpdateTopic(topic.id, 'isExercise', false);
                         } else {
                           handleUpdateTopic(topic.id, 'name', e.target.value);
+                          const pt = PREDEFINED_TOPICS.find(p => p.name === e.target.value);
+                          if (pt) {
+                             handleUpdateTopic(topic.id, 'isExercise', pt.isExercise);
+                          }
                         }
                       }}
                       className="bg-transparent text-white focus:outline-none font-medium cursor-pointer"
                     >
-                      {PREDEFINED_TOPICS.map(pt => <option key={pt} value={pt} className="bg-slate-900">{pt}</option>)}
+                      {PREDEFINED_TOPICS.map(pt => <option key={pt.name} value={pt.name} className="bg-slate-900">{pt.name}</option>)}
                       <option value="Custom" className="bg-slate-900">Custom...</option>
                     </select>
-                    {!PREDEFINED_TOPICS.includes(topic.name) && (
+                    {!PREDEFINED_TOPICS.find(p => p.name === topic.name) && (
                       <input 
                         type="text" 
                         value={topic.name === 'Custom Topic' ? '' : topic.name}
@@ -344,6 +370,15 @@ const SPLITS: { value: ScheduleSplit, label: string, desc: string, weights: numb
                       />
                     )}
                   </div>
+                  <label className="flex items-center gap-1.5 text-xs text-slate-400 font-bold cursor-pointer bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700 transition">
+                    <input 
+                      type="checkbox" 
+                      checked={topic.isExercise || false}
+                      onChange={(e) => handleUpdateTopic(topic.id, 'isExercise', e.target.checked)}
+                      className="accent-aws-orange w-3 h-3"
+                    />
+                    EXERCISE
+                  </label>
                   <div className="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
                      <span className="text-xs text-slate-500 font-bold uppercase">Weight:</span>
                      <select 
@@ -412,31 +447,36 @@ const SPLITS: { value: ScheduleSplit, label: string, desc: string, weights: numb
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {schedule.map((slot) => (
+        {schedule.map((day) => (
           <div
-            key={slot.date.toISOString()}
-            className={`p-5 rounded-xl border flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-xl
-               ${slot.type === 'REST' ? 'bg-slate-900/40 border-slate-800 text-slate-500 opacity-60' : `${slot.color} bg-opacity-10 backdrop-blur-sm`} 
-               ${slot.isToday ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-950 scale-105 z-10' : ''}`}
+            key={day.date.toISOString()}
+            className={`p-5 rounded-xl border flex flex-col transition-all hover:-translate-y-1 hover:shadow-xl
+               ${day.slots[0].type === 'REST' ? 'bg-slate-900/40 border-slate-800 text-slate-500 opacity-60' : 'bg-slate-900/80 border-slate-700 backdrop-blur-sm'} 
+               ${day.isToday ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-950 scale-105 z-10' : ''}`}
           >
-             <div>
+             <div className="mb-4">
                <div className="flex items-center gap-2 flex-wrap mb-1">
-                 <h3 className={`text-lg font-bold ${slot.type === 'REST' ? 'text-slate-600' : 'text-white'}`}>{slot.dayName}</h3>
-                 {slot.isToday && (
+                 <h3 className={`text-lg font-bold ${day.slots[0].type === 'REST' ? 'text-slate-600' : 'text-white'}`}>{day.dayName}</h3>
+                 {day.isToday && (
                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-white text-slate-900">TODAY</span>
                  )}
                </div>
-               <div className="text-xs font-mono opacity-60 mb-3">{slot.dateLabel}</div>
-               
-               {slot.type !== 'REST' && (
-                  <div className="inline-flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-md text-xs font-mono mb-4 border border-white/5">
-                     <span className="opacity-70">⏱️</span> {slot.time}
-                  </div>
-               )}
+               <div className="text-xs font-mono opacity-60">{day.dateLabel}</div>
              </div>
 
-             <div className={`${slot.type === 'REST' ? 'bg-slate-950/50' : 'bg-black/20 shadow-inner'} p-3 rounded-lg text-sm backdrop-blur-sm font-medium leading-snug border border-white/5`}>
-               {slot.task}
+             <div className="flex flex-col gap-3">
+               {day.slots.map((slot, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg border ${slot.type === 'REST' ? 'border-transparent' : slot.color || 'border-slate-700'} ${slot.type === 'REST' ? '' : 'bg-opacity-20'}`}>
+                     {slot.type !== 'REST' && (
+                        <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono mb-2 bg-black/30 border border-white/5 text-white/90">
+                           <span className="opacity-70">⏱️</span> {slot.time}
+                        </div>
+                     )}
+                     <div className={`${slot.type === 'REST' ? 'text-slate-500' : 'text-white font-bold'} text-sm leading-snug`}>
+                        {slot.task}
+                     </div>
+                  </div>
+               ))}
              </div>
           </div>
         ))}

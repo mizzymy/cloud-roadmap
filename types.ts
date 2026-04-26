@@ -183,6 +183,7 @@ export interface ScheduleTopic {
   name: string;
   color: string;
   weight: number; // 1 to 5, higher weight means more time allocated
+  isExercise?: boolean;
 }
 
 export interface ScheduleConfig {
@@ -192,14 +193,18 @@ export interface ScheduleConfig {
 }
 
 export interface GeneratedSlot {
-  date: Date;
-  dayName: string;
-  dateLabel: string;
-  isToday: boolean;
   time: string;
   task: string;
   type: string; // Used for generic coloring if no topic color
   durationHours: number;
   topicId?: string;
   color?: string; // Hex or tailwind class for the topic
+}
+
+export interface GeneratedDay {
+  date: Date;
+  dayName: string;
+  dateLabel: string;
+  isToday: boolean;
+  slots: GeneratedSlot[];
 }
